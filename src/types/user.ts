@@ -13,6 +13,11 @@ export interface User {
    is_active?: boolean;
    is_superuser?: boolean;
    oauth_provider?: string;
+   // Optional profile stats (parent/student dashboards)
+   coursesEnrolled?: number;
+   completedCourses?: number;
+   achievements?: number;
+   averageGrade?: string;
 }
 
 export interface UserUpdate {

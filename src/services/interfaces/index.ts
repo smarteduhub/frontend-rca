@@ -9,6 +9,7 @@ import type { Course, CourseFormData, Material } from '@/types/course';
 import type { User, UserUpdate } from '@/types/user';
 import type { Assignment } from '@/types/assignments';
 import type { ListQueryParams, PaginatedResponse } from '../types';
+import type { AuthResponse } from "@/types/api";
 
 /**
  * Course Service Interface
@@ -33,11 +34,7 @@ export interface ICourseService {
  * Auth Service Interface
  */
 export interface IAuthService {
-  login(email: string, password: string): Promise<{
-    access_token: string;
-    token_type: string;
-    user: User;
-  }>;
+  login(email: string, password: string): Promise<AuthResponse>;
   register(data: {
     name: string;
     email: string;
@@ -48,20 +45,12 @@ export interface IAuthService {
     phone?: string;
     country?: string;
     field_of_study?: string;
-  }): Promise<{
-    access_token: string;
-    token_type: string;
-    user: User;
-  }>;
+  }): Promise<AuthResponse>;
   logout(): Promise<void>;
   getProfile(): Promise<User>;
   updateProfile(data: UserUpdate): Promise<User>;
   initiateOAuth(provider: string, role?: string): Promise<{ auth_url: string }>;
-  handleOAuthCallback(provider: string, code: string): Promise<{
-    access_token: string;
-    token_type: string;
-    user: User;
-  }>;
+  handleOAuthCallback(provider: string, code: string): Promise<AuthResponse>;
 }
 
 /**

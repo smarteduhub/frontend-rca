@@ -94,15 +94,9 @@ const Footer = () => {
    const { profile } = useInstitution();
 
    return (
-      <footer className="relative bg-gradient-to-br from-main via-indigo-500 to-indigo-700 pt-20 overflow-hidden">
-         {/* Background decoration elements */}
-         <div className="absolute top-0 left-0 w-full h-full">
-            <div className="absolute top-40 right-40 w-80 h-80 bg-indigo-400 rounded-full filter blur-3xl opacity-5"></div>
-            <div className="absolute bottom-40 left-40 w-96 h-96 bg-blue-500 rounded-full filter blur-3xl opacity-5"></div>
-         </div>
-
+      <footer className="relative bg-gradient-to-r from-blue-500 to-indigo-700 text-slate-100 pt-20 overflow-hidden">
          <div className="container mx-auto px-4 relative z-10">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 pb-12 border-b border-indigo-800/30">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 pb-12 border-b border-indigo-200/30">
                {/* Brand column */}
                <div className="lg:col-span-4 space-y-6">
                   <Link
@@ -127,7 +121,7 @@ const Footer = () => {
                   </Link>
 
                   {/* Task 7: Show institution description */}
-                  <p className="text-indigo-200">
+                  <p className="text-slate-300">
                      {profile?.description || "Revolutionize your learning journey with our AI-powered platform that adapts to your unique pace and style."}
                   </p>
 
@@ -137,7 +131,7 @@ const Footer = () => {
                      {profile?.address && (
                         <div className="flex items-center gap-3">
                            <MapPin className="h-5 w-5 text-indigo-400" />
-                           <span className="text-indigo-200">
+                           <span className="text-slate-300">
                               {profile.address}
                            </span>
                         </div>
@@ -147,7 +141,7 @@ const Footer = () => {
                      {profile?.email && (
                         <div className="flex items-center gap-3">
                            <Mail className="h-5 w-5 text-indigo-400" />
-                           <span className="text-indigo-200">
+                           <span className="text-slate-300">
                               {profile.email}
                            </span>
                         </div>
@@ -157,7 +151,7 @@ const Footer = () => {
                      {profile?.phone && (
                         <div className="flex items-center gap-3">
                            <Phone className="h-5 w-5 text-indigo-400" />
-                           <span className="text-indigo-200">
+                           <span className="text-slate-300">
                               {profile.phone}
                            </span>
                         </div>
@@ -171,7 +165,7 @@ const Footer = () => {
                         <Link
                            href={profile.socialLinks.facebook}
                            aria-label="Facebook"
-                           className="bg-indigo-800/50 hover:bg-indigo-700 transition-colors h-10 w-10 rounded-full flex items-center justify-center text-indigo-200 hover:text-white"
+                           className="bg-slate-800 hover:bg-slate-700 transition-colors h-10 w-10 rounded-full flex items-center justify-center text-slate-200 hover:text-white"
                         >
                            <Facebook size={18} />
                         </Link>
@@ -182,7 +176,7 @@ const Footer = () => {
                         <Link
                            href={profile.socialLinks.instagram}
                            aria-label="Instagram"
-                           className="bg-indigo-800/50 hover:bg-indigo-700 transition-colors h-10 w-10 rounded-full flex items-center justify-center text-indigo-200 hover:text-white"
+                           className="bg-slate-800 hover:bg-slate-700 transition-colors h-10 w-10 rounded-full flex items-center justify-center text-slate-200 hover:text-white"
                         >
                            <Instagram size={18} />
                         </Link>
@@ -193,7 +187,7 @@ const Footer = () => {
                         <Link
                            href={profile.socialLinks.twitter}
                            aria-label="Twitter"
-                           className="bg-indigo-800/50 hover:bg-indigo-700 transition-colors h-10 w-10 rounded-full flex items-center justify-center text-indigo-200 hover:text-white"
+                           className="bg-slate-800 hover:bg-slate-700 transition-colors h-10 w-10 rounded-full flex items-center justify-center text-slate-200 hover:text-white"
                         >
                            <Twitter size={18} />
                         </Link>
@@ -213,7 +207,7 @@ const Footer = () => {
                               <li key={index}>
                                  <Link
                                     href={link.href}
-                                    className="text-indigo-200 hover:text-white hover:underline transition-colors inline-flex items-center"
+                                    className="text-slate-300 hover:text-white hover:underline transition-colors inline-flex items-center"
                                  >
                                     {link.title}
                                  </Link>
@@ -229,7 +223,7 @@ const Footer = () => {
                   <h3 className="text-white font-semibold">
                      Subscribe to our newsletter
                   </h3>
-                  <p className="text-indigo-200">
+                  <p className="text-slate-300">
                      Stay updated with the latest features, educational tips,
                      and special offers.
                   </p>
@@ -239,16 +233,16 @@ const Footer = () => {
                         <Input
                            type="email"
                            placeholder="Your email address"
-                           className="bg-indigo-800/30 border-indigo-700 text-white placeholder:text-indigo-300 py-6 pr-12"
+                           className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-400 py-6 pr-12"
                         />
                         <Button
-                           className="absolute right-1 top-1/2 -translate-y-1/2 bg-indigo-600 hover:bg-indigo-500"
+                           className="absolute right-1 top-1/2 -translate-y-1/2 bg-main hover:bg-main/90"
                            size="sm"
                         >
                            <ArrowRight className="h-4 w-4" />
                         </Button>
                      </div>
-                     <p className="text-xs text-indigo-300">
+                     <p className="text-xs text-slate-400">
                         By subscribing, you agree to our Privacy Policy and
                         consent to receive updates.
                      </p>
@@ -258,26 +252,26 @@ const Footer = () => {
 
             {/* Copyright section */}
             <div className="py-8 flex flex-col md:flex-row justify-between items-center gap-4">
-               <p className="text-indigo-300 text-sm">
+               <p className="text-slate-400 text-sm">
                   © {currentYear} Smart Eduhub. All rights reserved.
                </p>
 
-               <div className="flex items-center divide-x divide-indigo-700">
+               <div className="flex items-center divide-x divide-indigo-200/40">
                   <Link
                      href="/"
-                     className="text-indigo-300 hover:text-white text-sm px-4 transition-colors"
+                     className="text-slate-400 hover:text-white text-sm px-4 transition-colors"
                   >
                      Privacy Policy
                   </Link>
                   <Link
                      href="/"
-                     className="text-indigo-300 hover:text-white text-sm px-4 transition-colors"
+                     className="text-slate-400 hover:text-white text-sm px-4 transition-colors"
                   >
                      Terms of Service
                   </Link>
                   <Link
                      href="/"
-                     className="text-indigo-300 hover:text-white text-sm px-4 transition-colors"
+                     className="text-slate-400 hover:text-white text-sm px-4 transition-colors"
                   >
                      Cookie Settings
                   </Link>

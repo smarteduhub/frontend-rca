@@ -27,10 +27,6 @@ export interface RatingStats {
 }
 
 export interface RatingWithFeedback extends Rating {
-   student: {
-      name: string;
-      email: string;
-      avatar?: string;
-   };
+   student: User & { avatar?: string };
    created_at: string;
 }

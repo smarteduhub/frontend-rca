@@ -171,11 +171,13 @@ const ProfilePage = () => {
                                     <p className="text-sm text-gray-500">
                                        Joined
                                     </p>
-                                    <p>
-                                       {new Date(
-                                          profileData?.created_at
-                                       ).toLocaleDateString()}
-                                    </p>
+                                   <p>
+                                      {profileData?.created_at
+                                         ? new Date(
+                                              profileData.created_at
+                                           ).toLocaleDateString()
+                                         : "Unknown"}
+                                   </p>
                                  </div>
                               </div>
                            </div>

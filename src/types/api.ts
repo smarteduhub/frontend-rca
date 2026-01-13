@@ -3,7 +3,13 @@
 export interface Token {
   access_token: string;
   token_type: string;
-  expires_in: number;
+  expires_in?: number;
+}
+
+export interface AuthResponse extends Token {
+  user?: UserResponse;
+  error?: string;
+  message?: string;
 }
 
 export interface UserResponse {

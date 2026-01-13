@@ -40,6 +40,7 @@ export interface Course extends CourseFormData {
       id: string;
       title: string;
       file_path: string;
+      viewed?: boolean;
    }>;
    ratings: any[];
    enrollments: any[];

@@ -1,12 +1,12 @@
 // src/hooks/useStudentData.ts
 import { useQuery } from '@tanstack/react-query';
-import { api } from '@/lib/api';
+import { authorizedAPI } from '@/lib/api';
 
 export function useStudentCourses() {
   return useQuery({
-    queryKey: ['student', 'courses'],
+    queryKey: ["student", "courses"],
     queryFn: async () => {
-      const { data } = await api.get('/api/student/courses');
+      const { data } = await authorizedAPI.get("/api/student/courses");
       return data;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -15,9 +15,9 @@ export function useStudentCourses() {
 
 export function useStudentAssignments() {
   return useQuery({
-    queryKey: ['student', 'assignments'],
+    queryKey: ["student", "assignments"],
     queryFn: async () => {
-      const { data } = await api.get('/api/student/assignments');
+      const { data } = await authorizedAPI.get("/api/student/assignments");
       return data;
     },
     staleTime: 2 * 60 * 1000, // 2 minutes

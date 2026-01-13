@@ -1,6 +1,6 @@
 "use client";
 
-import axios from "axios";
+import axios, { type AxiosRequestHeaders } from "axios";
 import { Cookies } from "react-cookie";
 import type {
   Token,
@@ -13,6 +13,7 @@ import type {
   EventResponse,
   AssignmentOut,
   ChildInfo,
+  AuthResponse,
 } from "@/types/api";
 
 const API_BASE =
@@ -38,10 +39,10 @@ api.interceptors.request.use((config) => {
     }
   }
   if (token) {
-    config.headers = {
-      ...config.headers,
-      Authorization: `Bearer ${token}`,
-    };
+    const headers = (config.headers || {}) as AxiosRequestHeaders;
+    headers.Authorization = `Bearer ${token}`;
+    headers.Accept = "application/json";
+    config.headers = headers;
   }
   return config;
 });
@@ -67,7 +68,7 @@ api.interceptors.response.use(
 export const apiClient = {
   // Auth
   login: (payload: UserLogin) =>
-    api.post<Token>("/auth/login", payload).then((r) => r.data),
+    api.post<AuthResponse>("/auth/login", payload).then((r) => r.data),
   logout: () => api.post<void>("/auth/logout").then((r) => r.data),
   profile: () => api.get<UserResponse>("/users/profile").then((r) => r.data),
 
@@ -102,7 +103,8 @@ export const apiClient = {
   enrolledCourses: () =>
     api.get<CourseOut[]>("/courses/enrolled/me").then((r) => r.data),
   userEvents: () => api.get<EventResponse[]>("/events/").then((r) => r.data),
-  parentChildren: () => api.get<ChildInfo[]>("/parent/children").then((r) => r.data),
+  parentChildren: () =>
+    api.get<ChildInfo[]>("/parent/children").then((r) => r.data),
 };
 
 export type ApiClient = typeof apiClient;

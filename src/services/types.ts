@@ -40,6 +40,7 @@ export interface ApiError {
  * Query parameters for list endpoints
  */
 export interface ListQueryParams {
+  [key: string]: unknown;
   page?: number;
   limit?: number;
   search?: string;

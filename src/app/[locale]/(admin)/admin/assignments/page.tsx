@@ -4,22 +4,16 @@ import { useGetAllAssignments } from "@/hooks/useAssignments";
 import { DataTable } from "@/components/DataTable";
 import { ColumnDef } from "@tanstack/react-table";
 import DashboardNavbar from "@/components/DashboardNavbar";
-
-interface Assignment {
-   id: string;
-   title: string;
-   description: string;
-   google_form_url?: string;
-   course: {
-      id: string;
-      title: string;
-   };
-}
+import type { Assignment } from "@/types/assignments";
 
 const columns: ColumnDef<Assignment>[] = [
    { accessorKey: "id", header: "ID" },
    { accessorKey: "title", header: "Title" },
-   { accessorKey: "description", header: "Description" },
+   {
+      accessorKey: "description",
+      header: "Description",
+      cell: ({ row }) => row.original.description ?? "No description",
+   },
    {
       accessorKey: "google_form_url",
       header: "Google Form URL",

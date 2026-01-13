@@ -24,10 +24,12 @@ import {
 } from "@/hooks/useCourses";
 import { useGetStudentAssignments } from "@/hooks/useAssignments";
 import { useStudentOverview } from "@/hooks/usePersonalized";
+import { useAuthStore } from "@/store/useAuthStore";
 import type { Course } from "@/types/course";
 import type { Assignment } from "@/types/assignments";
 
 const StudentHome = () => {
+  const { user } = useAuthStore();
   const {
     data: enrolledCourses = [],
     isLoading: isLoadingCourses,
@@ -113,6 +115,14 @@ const StudentHome = () => {
 
   return (
     <div className="space-y-8">
+      <div className="space-y-1">
+        <h1 className="text-3xl font-semibold text-slate-900">
+          Welcome {user?.name ? `, ${user.name}` : ""}
+        </h1>
+        <p className="text-slate-600">
+          Here’s what matters today. Stay steady and keep moving forward.
+        </p>
+      </div>
       {/* Daily Focus */}
       <Card className="border-slate-200 bg-gradient-to-r from-blue-50 to-indigo-50">
         <CardHeader>
@@ -140,9 +150,6 @@ const StudentHome = () => {
                     Due {formatDue(a)} • {(a as any).course?.title || "Course"}
                   </p>
                 </div>
-                <Button size="sm" variant="outline">
-                  Start now
-                </Button>
               </div>
             ))
           )}
@@ -258,23 +265,8 @@ const StudentHome = () => {
               Your personal tutor. Tests remain in one official language.
             </p>
           </CardHeader>
-          <CardContent className="space-y-2">
-            {[
-              "Explain this topic in simpler steps",
-              "Break this lesson into a 20-min plan",
-              "Give practice questions",
-              "Summarize teacher feedback",
-              "Explain in another language (study only)",
-            ].map((item) => (
-              <Button
-                key={item}
-                variant="outline"
-                className="justify-start text-left"
-                size="sm"
-              >
-                {item}
-              </Button>
-            ))}
+          <CardContent className="space-y-2 text-sm text-slate-700">
+            <p>AI prompts will appear here when enabled.</p>
           </CardContent>
         </Card>
       </section>
