@@ -21,14 +21,17 @@ Open [http://localhost:3000](http://localhost:3000)
 ## 🔧 Configuration
 
 Create `.env.local` with your backend base URL (include `/api/v1`):
+
 ```
 NEXT_PUBLIC_SERVER_URL=https://<your-backend-host>/api/v1
 ```
+
 Tokens are read from the `access_token` cookie (fallback to `localStorage`). All API calls use this base URL; make sure CORS allows your frontend origin.
 
 ## 📖 Documentation
 
 See **[DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)** for:
+
 - Complete feature list
 - Testing instructions
 - Test credentials
@@ -46,14 +49,9 @@ See **[DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)** for:
 - **Multi-language**: English, French, Kinyarwanda
 - **Responsive Design**: Works on all devices
 
-## 🔑 Test Credentials
+## 🔑 Access
 
-| Role | Email | Password |
-|------|-------|----------|
-| Admin | admin@smarteduhub.com | password123 |
-| Teacher | teacher@smarteduhub.com | password123 |
-| Student | student@smarteduhub.com | password123 |
-| Parent | parent@smarteduhub.com | password123 |
+Use your issued accounts for each role (Admin, Teacher, Student, Parent). Test credentials are not bundled in this repo—request them from the project admin or create via the backend/admin panel.
 
 ## 🛠️ Tech Stack
 
@@ -65,18 +63,25 @@ See **[DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)** for:
 - **Authentication**: JWT with cookies
 - **Internationalization**: next-intl
 
-## 📦 Project Structure
+## 📦 Project Structure (Integrated)
 
 ```
 src/
-├── app/              # Pages and routes
-├── components/       # React components
-├── hooks/            # Custom React hooks
-├── services/         # API services layer
-├── store/            # Global state (Zustand)
-├── types/            # TypeScript types
-├── lib/              # Utilities
-└── middleware.ts     # Route protection
+├── app/                        # Next.js App Router pages by locale and role
+│   ├── [locale]/(auth)/...     # Login, activate
+│   ├── [locale]/(admin)/...    # Admin dashboard, users
+│   ├── [locale]/(teacher)/...  # Teacher dashboard & tools
+│   ├── [locale]/(student)/...  # Student dashboard
+│   ├── [locale]/(parent)/...   # Parent dashboard
+│   └── layout.tsx              # Root layout
+├── components/                 # Shared UI (Navbar, DataTable, cards, forms)
+├── hooks/                      # React Query hooks (auth, users, courses, ai, etc.)
+├── services/                   # API service layer (auth, base service)
+├── lib/                        # Axios clients, helpers, apiClient (OpenAPI-aligned)
+├── store/                      # Zustand stores (auth, notifications)
+├── types/                      # Shared types (api, course, user, assignments)
+├── middleware.ts               # Role-based route protection
+└── providers/                  # Context/providers (i18n, theme, query)
 ```
 
 ## 🧪 Testing
