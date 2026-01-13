@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Brain, Target, LightbulbIcon, TrendingUp } from "lucide-react";
-import { ReactNode } from "react";
+import { BellRing, BookOpen, ClipboardCheck, ShieldCheck } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 export const BenefitsSection = () => {
@@ -8,22 +7,22 @@ export const BenefitsSection = () => {
 
    const benefitList = [
       {
-         icon: <Brain className="h-8 w-8" />,
+         icon: <BookOpen className="h-8 w-8" />,
          title: t("personalized.title"),
          description: t("personalized.description"),
       },
       {
-         icon: <Target className="h-8 w-8" />,
+         icon: <ClipboardCheck className="h-8 w-8" />,
          title: t("analytics.title"),
          description: t("analytics.description"),
       },
       {
-         icon: <LightbulbIcon className="h-8 w-8" />,
+         icon: <BellRing className="h-8 w-8" />,
          title: t("content.title"),
          description: t("content.description"),
       },
       {
-         icon: <TrendingUp className="h-8 w-8" />,
+         icon: <ShieldCheck className="h-8 w-8" />,
          title: t("improvement.title"),
          description: t("improvement.description"),
       },

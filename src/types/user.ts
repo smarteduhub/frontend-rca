@@ -1,13 +1,18 @@
 export interface User {
-   id?: string;
-   name?: string;
+   id: string;
+   name: string;
    email: string;
    username?: string;
    phone?: string;
    country?: string;
    field_of_study?: string;
-   role?: string;
+   role: string;
+   grade?: string; // Year/Grade level (e.g., "Year 1", "Year 2", "Year 3")
+   year?: string; // Alternative naming for year level
    created_at?: string;
+   is_active?: boolean;
+   is_superuser?: boolean;
+   oauth_provider?: string;
 }
 
 export interface UserUpdate {

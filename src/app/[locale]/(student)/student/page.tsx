@@ -1,173 +1,380 @@
-//@ts-nocheck
-
 "use client";
-import { AssignmentChart } from "@/components/AssignmentChart";
-import CustomCard from "@/components/CustomCard";
-import DashboardNavbar from "@/components/DashboardNavbar";
-import { StudentBarChart } from "@/components/StudentBarChart";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Book, Pen, Star, Users, Loader2 } from "lucide-react";
-import Link from "next/link";
+
 import React from "react";
-import { useGetAllCourses, useGetEnrolledCourses } from "@/hooks/useCourses";
+import {
+  Book,
+  Star,
+  Pen,
+  Users,
+  ArrowRight,
+  Loader2,
+  TrendingUp,
+  Calendar,
+  Sparkles,
+  CheckCircle2,
+  Clock3,
+  BadgeCheck,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
+import {
+  useGetEnrolledCourses,
+  calculateCourseProgress,
+} from "@/hooks/useCourses";
 import { useGetStudentAssignments } from "@/hooks/useAssignments";
-import { useGetStudents } from "@/hooks/useStudents";
-import { EnrolledCourseCard } from "@/components/student/EnrolledCourseCard";
-import ChatBot from "@/components/ChatBot";
+import { useStudentOverview } from "@/hooks/usePersonalized";
+import type { Course } from "@/types/course";
+import type { Assignment } from "@/types/assignments";
 
 const StudentHome = () => {
-   const {
-      data: enrolledCourses,
-      isLoading: isLoadingCourses,
-      error,
-   } = useGetEnrolledCourses();
-   const { data: allCourses } = useGetAllCourses();
-   const { data: assignments } = useGetStudentAssignments();
-   const { data: students } = useGetStudents();
+  const {
+    data: enrolledCourses = [],
+    isLoading: isLoadingCourses,
+    error: coursesError,
+  } = useGetEnrolledCourses();
+  const {
+    data: assignments = [],
+    isLoading: isLoadingAssignments,
+    error: assignmentsError,
+  } = useGetStudentAssignments();
+  const { events } = useStudentOverview();
 
-   const completedAssignments =
-      assignments?.filter((a: { status: string; }) => a.status === "completed")?.length || 0;
-   const completedCourses =
-      enrolledCourses?.filter((c) => c.progress === 100)?.length || 0;
-   const totalProgress =
-      enrolledCourses?.reduce(
-         (acc, course) => acc + (course.progress || 0),
-         0
-      ) || 0;
-   const averageProgress = enrolledCourses?.length
-      ? totalProgress / enrolledCourses.length
+  const allCourses = enrolledCourses.map((course: Course) => ({
+    ...course,
+    progress: calculateCourseProgress(course) || 0,
+  }));
+
+  const completedCourses = allCourses.filter(
+    (course) => course.progress >= 100
+  ).length;
+
+  const averageProgress =
+    allCourses.length > 0
+      ? allCourses.reduce((acc, course) => acc + (course.progress || 0), 0) /
+        allCourses.length
       : 0;
 
-   const cardData = [
-      {
-         icon: Book,
-         desc: "Total Available Courses",
-         title: `${allCourses?.length || 0} Courses`,
-         color: "#979205",
-      },
-      {
-         icon: Star,
-         desc: "Completed Courses",
-         title: `${completedCourses} Courses`,
-         color: "#FEB185",
-      },
-      {
-         icon: Pen,
-         desc: "Completed Assignments",
-         title: `${completedAssignments} assignments`,
-         color: "#8495B2",
-      },
-      {
-         icon: Users,
-         desc: "Fellow Students",
-         title: `${students?.length || 0} Students`,
-         color: "#311D4A",
-      },
-   ];
+  const previewCourses = allCourses.slice(0, 4);
+  const isLoading = isLoadingCourses || isLoadingAssignments;
+  const error = coursesError || assignmentsError;
 
-   // Take only first 3 courses for preview
-   const previewCourses = enrolledCourses?.slice(0, 3) || [];
-   console.log("Ndashima",enrolledCourses);
-   
+  const assignmentList: Assignment[] = (assignments as Assignment[]) || [];
 
-   return (
-      <div>
-         <DashboardNavbar title="Dashboard" />
-         <div className="flex flex-col gap-2 w-[40%] my-6">
-            <h4>Curriculum Progress</h4>
-            <Progress value={averageProgress} />
-         </div>
+  const pendingAssignments = assignmentList.filter((a) => !a.submitted_at);
+  const submittedAssignments = assignmentList.filter(
+    (a) => a.submitted_at && !(a as any).grade
+  );
+  const gradedAssignments = assignmentList.filter((a) => (a as any).grade);
 
-         <section className="grid w-full grid-cols-1 gap-4 gap-x-8 transition-all sm:grid-cols-2 xl:grid-cols-4 mb-6">
-            {cardData.map((d, i) => (
-               <CustomCard
-                  key={i}
-                  icon={d.icon}
-                  desc={d.desc}
-                  title={d.title}
-                  color={d.color}
-               />
+  const dueSoon = [...pendingAssignments]
+    .sort((a, b) => {
+      const dateA = new Date((a as any).due_date || "").getTime();
+      const dateB = new Date((b as any).due_date || "").getTime();
+      return dateA - dateB;
+    })
+    .slice(0, 3);
+
+  const StatCard = ({
+    title,
+    value,
+    helper,
+    icon,
+  }: {
+    title: string;
+    value: string | number;
+    helper?: string;
+    icon: React.ReactNode;
+  }) => (
+    <Card className="h-full border border-slate-200">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium text-slate-600">
+          {title}
+        </CardTitle>
+        <div className="text-slate-500">{icon}</div>
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold text-slate-900">{value}</div>
+        {helper && <p className="text-xs text-slate-500 mt-1">{helper}</p>}
+      </CardContent>
+    </Card>
+  );
+
+  const formatDue = (assignment: Assignment) => {
+    const due = (assignment as any).due_date
+      ? new Date((assignment as any).due_date)
+      : null;
+    if (!due) return "No due date";
+    return due.toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  return (
+    <div className="space-y-8">
+      {/* Daily Focus */}
+      <Card className="border-slate-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+        <CardHeader>
+          <CardTitle className="text-xl font-semibold text-slate-900">
+            Today’s focus
+          </CardTitle>
+          <p className="text-sm text-slate-600">
+            Quick wins to keep you on track.
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {dueSoon.length === 0 ? (
+            <div className="text-slate-700">
+              No urgent tasks. Use 20 focused minutes to review a course note.
+            </div>
+          ) : (
+            dueSoon.map((a) => (
+              <div
+                key={a.id || a.title}
+                className="flex items-center justify-between rounded-lg border border-slate-100 bg-white px-3 py-2"
+              >
+                <div>
+                  <p className="font-semibold text-slate-900">{a.title}</p>
+                  <p className="text-xs text-slate-600">
+                    Due {formatDue(a)} • {(a as any).course?.title || "Course"}
+                  </p>
+                </div>
+                <Button size="sm" variant="outline">
+                  Start now
+                </Button>
+              </div>
+            ))
+          )}
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm" className="gap-2">
+              <CheckCircle2 className="h-4 w-4" />
+              Finish one pending task
+            </Button>
+            <Button size="sm" variant="outline" className="gap-2">
+              <Clock3 className="h-4 w-4" />
+              20-min review
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Stats */}
+      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          title="Enrolled courses"
+          value={allCourses.length}
+          helper="Your current load"
+          icon={<Book className="w-4 h-4 text-blue-600" />}
+        />
+        <StatCard
+          title="Completed courses"
+          value={completedCourses}
+          helper="Keep going"
+          icon={<Star className="w-4 h-4 text-green-600" />}
+        />
+        <StatCard
+          title="Pending assignments"
+          value={pendingAssignments.length}
+          helper="Submit on time"
+          icon={<Pen className="w-4 h-4 text-purple-600" />}
+        />
+        <StatCard
+          title="On-track progress"
+          value={`${Math.round(averageProgress)}%`}
+          helper={averageProgress >= 60 ? "On track" : "Needs attention"}
+          icon={<Users className="w-4 h-4 text-orange-600" />}
+        />
+      </section>
+
+      {/* Learning Progress */}
+      <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <Card className="lg:col-span-2 border border-slate-200">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BadgeCheck className="h-5 w-5 text-blue-700" />
+              Learning progress
+            </CardTitle>
+            <p className="text-sm text-slate-600">
+              Progress bars per course. Aim for steady daily steps.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {isLoading ? (
+              <div className="flex items-center gap-3 py-4 text-slate-600">
+                <Loader2 className="h-5 w-5 animate-spin" />
+                Loading your courses...
+              </div>
+            ) : error ? (
+              <div className="text-slate-600 py-4">
+                Couldn&apos;t load progress. Please refresh.
+              </div>
+            ) : previewCourses.length === 0 ? (
+              <div className="text-slate-600 py-4">
+                No courses yet. Enroll to start tracking progress.
+              </div>
+            ) : (
+              previewCourses.map((course) => (
+                <div
+                  key={course.id}
+                  className="rounded-lg border border-slate-100 p-3 space-y-2"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-semibold text-slate-900 line-clamp-1">
+                        {course.title}
+                      </p>
+                      <p className="text-xs text-slate-500">
+                        {(course as any).status === "on-track"
+                          ? "On track"
+                          : course.progress >= 60
+                          ? "On track"
+                          : "Needs attention"}
+                      </p>
+                    </div>
+                    <span className="text-sm text-slate-600">
+                      {Math.round(course.progress || 0)}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-slate-100 rounded-full h-2">
+                    <div
+                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${course.progress || 0}%` }}
+                    ></div>
+                  </div>
+                </div>
+              ))
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="border border-slate-200">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-blue-700" />
+              AI study assistant
+            </CardTitle>
+            <p className="text-sm text-slate-600">
+              Your personal tutor. Tests remain in one official language.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {[
+              "Explain this topic in simpler steps",
+              "Break this lesson into a 20-min plan",
+              "Give practice questions",
+              "Summarize teacher feedback",
+              "Explain in another language (study only)",
+            ].map((item) => (
+              <Button
+                key={item}
+                variant="outline"
+                className="justify-start text-left"
+                size="sm"
+              >
+                {item}
+              </Button>
             ))}
-         </section>
+          </CardContent>
+        </Card>
+      </section>
 
-         <section className=" rounded-lg mt-6 flex gap-6 flex-col md:flex-row">
-            <div className="border p-4 flex flex-col gap-4 w-full md:w-[50%] rounded-lg">
-               <p className="">Performance Overview</p>
-               <StudentBarChart />
-               <Link
-                  href="/student/courses"
-                  className="text-main"
-               >
-                  View All Courses
-               </Link>
-            </div>
-            <div className="border p-4 flex flex-col gap-4 w-full md:w-[50%] rounded-lg">
-               <p className="text-transparent bg-clip-text bg-gradient-to-r from-main via-blue-400 to-pink-200">
-                  Assignments Overview
-               </p>
-
-               <AssignmentChart />
-               <Link
-                  href="/student/assignments"
-                  className="text-main"
-               >
-                  View All Assignments
-               </Link>
-            </div>
-         </section>
-
-         {/* enrolled courses  */}
-         <section className="my-6">
-            <div className="flex items-center justify-between w-full my-4">
-               <h3>Enrolled Courses</h3>
-               <Link href="/student/enrolled-courses">
-                  <Button
-                     className="text-main"
-                     variant="outline"
+      {/* Assignments & Tests */}
+      <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {[
+          { title: "Pending", list: pendingAssignments },
+          { title: "Submitted", list: submittedAssignments },
+          { title: "Graded", list: gradedAssignments },
+        ].map((group) => (
+          <Card key={group.title} className="border border-slate-200">
+            <CardHeader>
+              <CardTitle>{group.title}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {group.list.length === 0 ? (
+                <p className="text-sm text-slate-500">Nothing here yet.</p>
+              ) : (
+                group.list.map((a) => (
+                  <div
+                    key={a.id || a.title}
+                    className="rounded-md border border-slate-100 p-3 space-y-1"
                   >
-                     View All
-                  </Button>
-               </Link>
-            </div>
+                    <p className="font-semibold text-slate-900 line-clamp-1">
+                      {a.title}
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      {(a as any).course?.title || "Course"} • Due{" "}
+                      {formatDue(a)}
+                    </p>
+                    {group.title === "Graded" && (a as any).grade && (
+                      <p className="text-xs text-green-700">
+                        Grade: {(a as any).grade} •{" "}
+                        {(a as any).feedback || "Feedback ready"}
+                      </p>
+                    )}
+                  </div>
+                ))
+              )}
+            </CardContent>
+          </Card>
+        ))}
+      </section>
 
-            {/* courses  */}
-            <div className="flex flex-wrap -mx-4">
-               {isLoadingCourses ? (
-                  <div className="w-full flex items-center justify-center py-12">
-                     <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
-                     <span className="ml-3 text-gray-600">
-                        Loading courses...
-                     </span>
-                  </div>
-               ) : error ? (
-                  <div className="w-full text-center py-12 text-gray-500">
-                     Failed to load courses. Please try again later.
-                  </div>
-               ) : previewCourses.length === 0 ? (
-                  <div className="w-full text-center py-12 text-gray-500">
-                     No courses enrolled yet.
-                     <Link
-                        href="/courses"
-                        className="block mt-2 text-main hover:underline"
-                     >
-                        Browse Available Courses
-                     </Link>
-                  </div>
-               ) : (
-                  previewCourses.map((course) => (
-                     <EnrolledCourseCard
-                        key={course.id}
-                        //@ts-ignore
-                        course={course}
-                     />
-                  ))
-               )}
-            </div>
-         </section>
-         {/* <ChatBot /> */}
-      </div>
-   );
+      {/* Gamified learning */}
+      <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <Card className="border border-slate-200">
+          <CardHeader>
+            <CardTitle>Badges</CardTitle>
+            <p className="text-sm text-slate-600">
+              Earned privately for your effort.
+            </p>
+          </CardHeader>
+          <CardContent className="flex flex-wrap gap-2">
+            {["Consistency", "Focus", "On-time", "Improvement"].map((b) => (
+              <div
+                key={b}
+                className="rounded-full bg-blue-50 text-blue-800 px-3 py-1 text-sm"
+              >
+                {b}
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        <Card className="border border-slate-200">
+          <CardHeader>
+            <CardTitle>Streaks</CardTitle>
+            <p className="text-sm text-slate-600">
+              Keep daily learning gentle and steady.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <p className="text-slate-800">
+              3-day streak • Great job staying consistent.
+            </p>
+            <Button size="sm" variant="outline">
+              Keep it going
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="border border-slate-200">
+          <CardHeader>
+            <CardTitle>Milestones</CardTitle>
+            <p className="text-sm text-slate-600">
+              Celebrate progress, not competition.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <p className="text-slate-800">Finish 2 assignments this week.</p>
+            <p className="text-slate-800">
+              Complete 30% of your lowest-progress course.
+            </p>
+          </CardContent>
+        </Card>
+      </section>
+    </div>
+  );
 };
 
 export default StudentHome;

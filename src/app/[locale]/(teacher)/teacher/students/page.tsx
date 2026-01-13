@@ -2,7 +2,7 @@
 //@ts-nocheck
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Search, Download, UserPlus, MoreHorizontal } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -61,6 +61,14 @@ const StudentsPage = () => {
    const { data: usersData, isLoading: isLoadingUsers } = useFetchUsers();
    const { data: coursesData, isLoading: isLoadingCourses } = useGetAllCourses();
    
+   // Year filter state (sync with teacher dashboard)
+   const [selectedYear, setSelectedYear] = useState<string>(() => {
+      if (typeof window !== 'undefined') {
+         return localStorage.getItem('teacher_selected_year') || 'all';
+      }
+      return 'all';
+   });
+
    // Add these state definitions
    const [isAddStudentDialogOpen, setIsAddStudentDialogOpen] = useState(false);
    const [newStudent, setNewStudent] = useState({
@@ -138,8 +146,27 @@ const StudentsPage = () => {
       });
    };
 
+   // Get available years from students
+   const availableYears = useMemo(() => {
+      const years = new Set<string>();
+      studentsData.forEach((student) => {
+         if (student.year || student.grade) {
+            const year = student.year || student.grade;
+            if (year) years.add(year);
+         }
+      });
+      return Array.from(years).sort();
+   }, [studentsData]);
+
+   // Update localStorage when year changes
+   useEffect(() => {
+      if (typeof window !== 'undefined') {
+         localStorage.setItem('teacher_selected_year', selectedYear);
+      }
+   }, [selectedYear]);
+
    // Calculate filtered students
-   const filteredStudents = React.useMemo(() => {
+   const filteredStudents = useMemo(() => {
       let results = studentsData;
 
       // Filter by search query
@@ -165,8 +192,15 @@ const StudentsPage = () => {
          results = results.filter((student) => student.grade === selectedGrade);
       }
 
+      // Filter by year
+      if (selectedYear && selectedYear !== "all") {
+         results = results.filter(
+            (student) => (student.year || student.grade) === selectedYear
+         );
+      }
+
       return results;
-   }, [searchQuery, selectedCourses, selectedGrade, studentsData]);
+   }, [searchQuery, selectedCourses, selectedGrade, selectedYear, studentsData]);
 
    if (isLoadingUsers || isLoadingCourses) {
       return <div>Loading...</div>;
@@ -181,6 +215,9 @@ const StudentsPage = () => {
                   <h1 className="text-3xl font-bold">Students</h1>
                   <p className="text-gray-500 mt-1">
                      Manage and monitor your students
+                     {selectedYear !== "all" && (
+                        <span className="ml-2 font-semibold text-blue-600">- {selectedYear}</span>
+                     )}
                   </p>
                </div>
                <div className="flex gap-2">
@@ -355,6 +392,26 @@ const StudentsPage = () => {
                         <h3 className="font-medium mb-4">Filter Students</h3>
 
                         <div className="space-y-6">
+                           {availableYears.length > 0 && (
+                              <div>
+                                 <Label htmlFor="year-filter" className="mb-2 block">
+                                    Year
+                                 </Label>
+                                 <Select value={selectedYear} onValueChange={setSelectedYear}>
+                                    <SelectTrigger id="year-filter">
+                                       <SelectValue placeholder="All Years" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                       <SelectItem value="all">All Years</SelectItem>
+                                       {availableYears.map((year) => (
+                                          <SelectItem key={year} value={year}>
+                                             {year}
+                                          </SelectItem>
+                                       ))}
+                                    </SelectContent>
+                                 </Select>
+                              </div>
+                           )}
                            <div>
                               <Label className="mb-2 block">
                                  Enrolled Courses

@@ -16,10 +16,15 @@ export default {
    		}
    	},
    	extend: {
+   		fontFamily: {
+   			sans: ['Inter', 'system-ui', 'sans-serif'],
+   			display: ['Inter', 'system-ui', 'sans-serif'],
+   		},
    		colors: {
    			main: '#1782CF',
    			submain: '#D4E8F6',
-   			background: '#EFF6FF',
+   			background: '#FFFFFF',
+   			surface: '#F8FAFB',
 			sub:"indigo-800",
    			foreground: 'hsl(var(--foreground))',
    			card: {

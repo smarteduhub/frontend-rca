@@ -26,7 +26,7 @@ interface ReviewProps {
 
 const reviewList: ReviewProps[] = [
    {
-      image: "/api/placeholder/40/40",
+      image: "https://placehold.co/40x40",
       name: "Sarah Johnson",
       userName: "High School Teacher",
       comment:
@@ -34,7 +34,7 @@ const reviewList: ReviewProps[] = [
       rating: 5.0,
    },
    {
-      image: "/api/placeholder/40/40",
+      image: "https://placehold.co/40x40",
       name: "Michael Rodriguez",
       userName: "Parent of 2",
       comment:
@@ -42,7 +42,7 @@ const reviewList: ReviewProps[] = [
       rating: 4.8,
    },
    {
-      image: "/api/placeholder/40/40",
+      image: "https://placehold.co/40x40",
       name: "Dr. Emily Chen",
       userName: "School District Director",
       comment:
@@ -50,7 +50,7 @@ const reviewList: ReviewProps[] = [
       rating: 4.9,
    },
    {
-      image: "/api/placeholder/40/40",
+      image: "https://placehold.co/40x40",
       name: "James Wilson",
       userName: "High School Student",
       comment:
@@ -58,7 +58,7 @@ const reviewList: ReviewProps[] = [
       rating: 5.0,
    },
    {
-      image: "/api/placeholder/40/40",
+      image: "https://placehold.co/40x40",
       name: "Dr. Olivia Thompson",
       userName: "Education Researcher",
       comment:
@@ -66,7 +66,7 @@ const reviewList: ReviewProps[] = [
       rating: 5.0,
    },
    {
-      image: "/api/placeholder/40/40",
+      image: "https://placehold.co/40x40",
       name: "Principal Robert Garcia",
       userName: "Elementary School Administrator",
       comment:

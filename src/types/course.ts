@@ -26,6 +26,7 @@ export interface CourseFormData {
    prerequisites?: string[];
    category: string;
    level: string;
+   year?: string; // Year/Grade level for the course (e.g., "Year 1", "Year 2", "Year 3")
 }
 
 export interface Course extends CourseFormData {
@@ -44,4 +45,5 @@ export interface Course extends CourseFormData {
    enrollments: any[];
    is_enrolled: boolean;
    progress?: number;
+   year?: string; // Year/Grade level for the course
 }

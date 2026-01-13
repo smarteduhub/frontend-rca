@@ -14,7 +14,7 @@ import { z } from "zod";
 import React, { useState, Suspense } from "react";
 import logo from "@/images/logo.svg";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import google from "@/images/google.png";
 import { useLoginUser } from "@/hooks/useAuth";
 import { toast } from "react-toastify";
@@ -52,6 +52,7 @@ function LoginForm() {
 
    const searchParams = useSearchParams();
    const redirectUrl = searchParams.get("redirectUrl");
+   const authReason = searchParams.get("reason");
 
    const loginMutation = useLoginUser();
    const initiateOAuthMutation = useInitiateOAuth();
@@ -64,6 +65,15 @@ function LoginForm() {
          password: "",
       },
    });
+
+   const bannerMessage =
+      authReason === "auth_required"
+         ? "Please activate your account and log in to access the dashboard."
+         : authReason === "session_expired"
+         ? "Session expired. Please log in again."
+         : authReason === "inactive"
+         ? "Your account is inactive. Please activate and log in."
+         : null;
 
    const onSubmit = async (data: FormData) => {
       setIsSubmitting(true);
@@ -122,36 +132,49 @@ function LoginForm() {
    };
 
    return (
-      <div className="py-8 md:py-10 w-full flex items-center justify-center">
-         <div className="bg-gradient-to-b from-background via-white to-main rounded-lg p-4 md:p-10 shadow-lg w-full md:w-5/6 xl:w-[70%] flex items-center justify-center">
-            <div className="flex flex-col gap-6 w-[95%]">
+      <div className="min-h-screen bg-[#f4f7fb] px-4 py-12">
+         <div className="mx-auto flex w-full max-w-md flex-col">
+            <div className="rounded-[28px] bg-white px-6 py-8 shadow-sm">
                <Link
-                  className="flex gap-3 items-center justify-start"
+                  className="flex items-center gap-3 mb-6"
                   href="/"
                >
-                  <Image
-                     src={logo}
-                     alt="smarteduhub"
-                  />{" "}
+                  <Image src={logo} alt="smarteduhub" />
                   <span className="text-main font-bold">Smart Eduhub</span>
                </Link>
-               <p>{t("login")}</p>
+
+               {bannerMessage && (
+                  <div className="mb-4 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+                     {bannerMessage}
+                  </div>
+               )}
+
+               <div className="space-y-1 mb-6">
+                  <h1 className="text-2xl font-semibold text-slate-900">
+                     {t("login")}
+                  </h1>
+                  <p className="text-sm text-slate-500">
+                     Sign in with your school email and password.
+                  </p>
+               </div>
 
                <Form {...form}>
                   <form
                      onSubmit={form.handleSubmit(onSubmit)}
-                     className="space-y-8 w-full z-30"
+                     className="space-y-6"
                   >
                      <FormField
                         control={form.control}
                         name="email"
                         render={({ field }) => (
                            <FormItem>
-                              <FormLabel>{t("email")} *</FormLabel>
+                              <FormLabel className="text-sm font-medium text-slate-600">
+                                 {t("email")} *
+                              </FormLabel>
                               <FormControl>
                                  <Input
-                                    className="bg-white p-6 outline-none border border-main "
-                                    placeholder="Email"
+                                    className="h-12 rounded-xl border border-slate-200 bg-white px-4 text-sm focus-visible:ring-main/20"
+                                    placeholder="you@school.edu"
                                     {...field}
                                  />
                               </FormControl>
@@ -163,26 +186,27 @@ function LoginForm() {
                            </FormItem>
                         )}
                      />
+
                      <FormField
                         control={form.control}
                         name="password"
                         render={({ field }) => (
                            <FormItem>
-                              <FormLabel>{t("password")} *</FormLabel>
+                              <FormLabel className="text-sm font-medium text-slate-600">
+                                 {t("password")} *
+                              </FormLabel>
                               <FormControl>
                                  <div className="relative">
                                     <Input
-                                       className="bg-white p-6 outline-none border border-main pr-10"
+                                       className="h-12 rounded-xl border border-slate-200 bg-white px-4 pr-12 text-sm focus-visible:ring-main/20"
                                        placeholder="Password"
                                        {...field}
                                        type={showPassword ? "text" : "password"}
                                     />
                                     <button
                                        type="button"
-                                       className="absolute right-3 top-1/2 transform -translate-y-1/2"
-                                       onClick={() =>
-                                          setShowPassword(!showPassword)
-                                       }
+                                       className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
+                                       onClick={() => setShowPassword(!showPassword)}
                                     >
                                        {showPassword ? (
                                           <EyeOff className="h-5 w-5" />
@@ -203,43 +227,44 @@ function LoginForm() {
 
                      <Button
                         type="submit"
-                        className="w-full bg-main py-6"
+                        className="h-12 w-full rounded-xl bg-main text-base font-semibold text-white shadow-lg shadow-main/30 transition hover:bg-main/90"
+                        disabled={isSubmitting}
                      >
                         {isSubmitting ? t("loading") : t("loginButton")}
                      </Button>
                   </form>
                </Form>
 
-               <div className="flex flex-col items-center gap-4 py-6">
-                  <p className="text-center">{t("or")}</p>
-                  <div className="w-full flex items-center justify-center">
-                     <div
-                        className="w-full md:w-1/2 bg-white py-4 px-8 cursor-pointer hover:bg-gray-50 border border-gray-200 rounded-lg transition-colors duration-200 flex items-center justify-center gap-3 shadow-sm"
-                        onClick={() => handleOAuthClick("google")}
-                     >
-                        <Image
-                           src={google}
-                           alt="google"
-                           className="w-6 h-6"
-                        />
-                        <span className="text-gray-600">
-                           {t("continueWithGoogle")}
-                        </span>
-                     </div>
+               <div className="mt-6 space-y-3">
+                  <div className="text-center text-sm text-slate-500">
+                     {t("or")}
+                  </div>
+                  <div
+                     className="w-full bg-white py-4 px-8 cursor-pointer hover:bg-gray-50 border border-gray-200 rounded-lg transition-colors duration-200 flex items-center justify-center gap-3 shadow-sm"
+                     onClick={() => handleOAuthClick("google")}
+                  >
+                     <Image
+                        src={google}
+                        alt="google"
+                        className="w-6 h-6"
+                     />
+                     <span className="text-gray-600">
+                        {t("continueWithGoogle")}
+                     </span>
                   </div>
                </div>
+            </div>
 
-               <div className="mt-6">
-                  <p>
-                     {t("dontHaveAccount")}
-                     <Link
-                        className="ml-4 text-white"
-                        href="/register"
-                     >
-                        {t("signup")}
-                     </Link>
-                  </p>
-               </div>
+            <div className="mt-6 text-center text-sm text-slate-600 space-y-1">
+               <p>
+                  Don&apos;t have an account?{" "}
+                  <Link
+                     className="text-main font-semibold hover:underline"
+                     href="/activate"
+                  >
+                     Activate Account
+                  </Link>
+               </p>
             </div>
          </div>
       </div>

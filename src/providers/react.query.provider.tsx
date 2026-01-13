@@ -7,7 +7,13 @@ const ReactQueryProvider = ({ children }: { children: React.ReactNode }) => {
   const [queryClient] = useState(() => new QueryClient({
     defaultOptions: {
       queries: {
-        refetchOnWindowFocus: false, refetchInterval: 60 * 1000 * 20
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
+        refetchOnReconnect: false,
+        staleTime: 5 * 60 * 1000, // 5 minutes - data is fresh for 5 min
+        gcTime: 10 * 60 * 1000, // 10 minutes - cache for 10 min (formerly cacheTime)
+        retry: 1, // Only retry once on failure
+        retryDelay: 1000, // Wait 1s before retry
       }
     }
   }));
@@ -18,3 +24,8 @@ const ReactQueryProvider = ({ children }: { children: React.ReactNode }) => {
 };
 
 export default ReactQueryProvider;
+
+
+
+
+

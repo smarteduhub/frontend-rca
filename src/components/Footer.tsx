@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import Logo from "@/images/logo.svg";
 import {
    Facebook,
    Instagram,
@@ -14,6 +13,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+// Task 7: Import useInstitution hook to access institution contact info
+import { useInstitution } from "@/hooks/useInstitution";
 
 interface FooterLink {
    title: string;
@@ -88,6 +89,9 @@ const footerSections: FooterSection[] = [
 
 const Footer = () => {
    const currentYear = new Date().getFullYear();
+   
+   // Task 7: Get institution profile to display contact info and social links
+   const { profile } = useInstitution();
 
    return (
       <footer className="relative bg-gradient-to-br from-main via-indigo-500 to-indigo-700 pt-20 overflow-hidden">
@@ -106,54 +110,94 @@ const Footer = () => {
                      className="inline-flex items-center"
                   >
                      <div className="bg-white p-2 rounded-lg">
+                        {/* Task 7: Use institution logo if available */}
+                        {/* Fix: Added width and height properties for Next.js Image component */}
                         <Image
-                           src={Logo}
-                           alt="Smart Eduhub Logo"
+                           src={profile?.logo || "/images/logo.svg"}
+                           alt={profile?.name || "Smart Eduhub Logo"}
+                           width={32}
+                           height={32}
                            className="h-8 w-auto"
                         />
                      </div>
+                     {/* Task 7: Show institution name with SmartEduHub branding */}
                      <span className="ml-3 text-xl font-bold text-white">
-                        Smart Eduhub
+                        {profile?.name || "Smart Eduhub"}
                      </span>
                   </Link>
 
+                  {/* Task 7: Show institution description */}
                   <p className="text-indigo-200">
-                     Revolutionize your learning journey with our AI-powered
-                     platform that adapts to your unique pace and style.
+                     {profile?.description || "Revolutionize your learning journey with our AI-powered platform that adapts to your unique pace and style."}
                   </p>
 
+                  {/* Task 7: Display institution contact information */}
                   <div className="space-y-4">
-                     <div className="flex items-center gap-3">
-                        <MapPin className="h-5 w-5 text-indigo-400" />
-                        <span className="text-indigo-200">
-                           123 Education Ave, Learning City
-                        </span>
-                     </div>
-                     <div className="flex items-center gap-3">
-                        <Mail className="h-5 w-5 text-indigo-400" />
-                        <span className="text-indigo-200">
-                           contact@smarteduhub.com
-                        </span>
-                     </div>
-                     <div className="flex items-center gap-3">
-                        <Phone className="h-5 w-5 text-indigo-400" />
-                        <span className="text-indigo-200">
-                           +1 (555) 123-4567
-                        </span>
-                     </div>
+                     {/* Address */}
+                     {profile?.address && (
+                        <div className="flex items-center gap-3">
+                           <MapPin className="h-5 w-5 text-indigo-400" />
+                           <span className="text-indigo-200">
+                              {profile.address}
+                           </span>
+                        </div>
+                     )}
+                     
+                     {/* Email */}
+                     {profile?.email && (
+                        <div className="flex items-center gap-3">
+                           <Mail className="h-5 w-5 text-indigo-400" />
+                           <span className="text-indigo-200">
+                              {profile.email}
+                           </span>
+                        </div>
+                     )}
+                     
+                     {/* Phone */}
+                     {profile?.phone && (
+                        <div className="flex items-center gap-3">
+                           <Phone className="h-5 w-5 text-indigo-400" />
+                           <span className="text-indigo-200">
+                              {profile.phone}
+                           </span>
+                        </div>
+                     )}
                   </div>
 
+                  {/* Task 7: Display institution social media links */}
                   <div className="flex gap-4 mt-6">
-                     {socialLinks.map((item, i) => (
+                     {/* Facebook */}
+                     {profile?.socialLinks?.facebook && (
                         <Link
-                           key={i}
-                           href={item.href}
-                           aria-label={item.label}
+                           href={profile.socialLinks.facebook}
+                           aria-label="Facebook"
                            className="bg-indigo-800/50 hover:bg-indigo-700 transition-colors h-10 w-10 rounded-full flex items-center justify-center text-indigo-200 hover:text-white"
                         >
-                           {item.icon}
+                           <Facebook size={18} />
                         </Link>
-                     ))}
+                     )}
+                     
+                     {/* Instagram */}
+                     {profile?.socialLinks?.instagram && (
+                        <Link
+                           href={profile.socialLinks.instagram}
+                           aria-label="Instagram"
+                           className="bg-indigo-800/50 hover:bg-indigo-700 transition-colors h-10 w-10 rounded-full flex items-center justify-center text-indigo-200 hover:text-white"
+                        >
+                           <Instagram size={18} />
+                        </Link>
+                     )}
+                     
+                     {/* Twitter */}
+                     {profile?.socialLinks?.twitter && (
+                        <Link
+                           href={profile.socialLinks.twitter}
+                           aria-label="Twitter"
+                           className="bg-indigo-800/50 hover:bg-indigo-700 transition-colors h-10 w-10 rounded-full flex items-center justify-center text-indigo-200 hover:text-white"
+                        >
+                           <Twitter size={18} />
+                        </Link>
+                     )}
                   </div>
                </div>
 

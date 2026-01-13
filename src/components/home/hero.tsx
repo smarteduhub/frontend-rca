@@ -2,70 +2,109 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Search, Sparkles } from "lucide-react";
+import {
+   BookOpen,
+   CalendarCheck2,
+   HeartHandshake,
+   Search,
+   Users,
+} from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
-import HeroImg from "@/images/hero.svg";
+import { Link } from "@/i18n/navigation";
 import { Input } from "../ui/input";
 import { useTranslations } from "next-intl";
 
 export const HeroSection = () => {
    const t = useTranslations("home.hero");
    const auth = useTranslations("auth");
+   const audiences = [
+      {
+         label: t("students"),
+         description: t("studentsDesc"),
+         icon: <BookOpen className="h-5 w-5 text-main" aria-hidden="true" />,
+      },
+      {
+         label: t("teachers"),
+         description: t("teachersDesc"),
+         icon: <Users className="h-5 w-5 text-main" aria-hidden="true" />,
+      },
+      {
+         label: t("parents"),
+         description: t("parentsDesc"),
+         icon: (
+            <HeartHandshake className="h-5 w-5 text-main" aria-hidden="true" />
+         ),
+      },
+   ];
 
    return (
-      <div className="relative overflow-hidden bg-gradient-to-br from-indigo-50 via-white to-blue-50 py-16 md:py-24">
-         {/* Background elements */}
-         <div className="absolute top-0 left-0 w-full h-full">
-            <div className="absolute top-20 right-20 w-64 h-64 bg-blue-400 rounded-full filter blur-3xl opacity-10"></div>
-            <div className="absolute bottom-20 left-20 w-72 h-72 bg-indigo-500 rounded-full filter blur-3xl opacity-10"></div>
+      <div className="relative overflow-hidden bg-gradient-to-b from-white via-sky-50 to-sky-100 py-16 md:py-24">
+         <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-10 right-6 h-32 w-32 rounded-full bg-main/10 blur-3xl" />
+            <div className="absolute bottom-6 left-6 h-32 w-32 rounded-full bg-blue-200/40 blur-3xl" />
          </div>
 
          <div className="container mx-auto px-4 relative z-10">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-               <div className="space-y-8">
+               <div className="space-y-7">
                   <Badge
                      variant="secondary"
-                     className="px-4 py-1 mb-4 text-indigo-600 bg-indigo-100 hover:bg-indigo-200 transition-colors"
+                     className="px-4 py-1 mb-2 text-main bg-white shadow-sm border border-main/10"
                   >
-                     <Sparkles className="w-4 h-4 mr-2" />
                      {t("badge")}
                   </Badge>
 
-                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900">
+                  <h1 className="text-4xl md:text-5xl font-bold leading-tight text-slate-900">
                      {t("title")}
                   </h1>
 
-                  <p className="text-lg text-slate-600 max-w-xl">
+                  <p className="text-lg text-slate-700 max-w-2xl">
                      {t("description")}
                   </p>
 
-                  <div className="flex gap-4 xl:gap-6">
+                  <div className="flex flex-wrap gap-3">
                      <Link href="/login">
-                        <Button className="bg-main rounded-full p-4 py-6 xl:px-16 px-8">
+                        <Button className="bg-main rounded-full px-8 py-6">
                            {auth("login")}
-                        </Button>
-                     </Link>
-                     <Link href="/register">
-                        <Button
-                           className="border border-main rounded-full p-4 py-6 xl:px-16 px-8"
-                           variant="outline"
-                        >
-                           {auth("register")}
                         </Button>
                      </Link>
                   </div>
 
-                  <div className="pt-6">
-                     <div className="p-2 bg-white rounded-xl shadow-lg max-w-md">
+                  <div className="grid gap-3 sm:grid-cols-3">
+                     {audiences.map((item) => (
+                        <div
+                           key={item.label}
+                           className="rounded-xl bg-white/70 border border-main/10 p-4 shadow-sm"
+                        >
+                           <div className="flex items-center gap-2 mb-2">
+                              <span
+                                 aria-hidden="true"
+                                 className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-main/10"
+                              >
+                                 {item.icon}
+                              </span>
+                              <p className="font-semibold text-slate-900 text-sm">
+                                 {item.label}
+                              </p>
+                           </div>
+                           <p className="text-sm text-slate-600 leading-relaxed">
+                              {item.description}
+                           </p>
+                        </div>
+                     ))}
+                  </div>
+
+                  <div className="pt-2">
+                     <div className="p-2 bg-white rounded-xl shadow-md max-w-xl border border-main/10">
                         <div className="relative flex items-center">
                            <Search className="absolute left-3 h-5 w-5 text-slate-400" />
                            <Input
                               type="text"
                               placeholder={t("searchPlaceholder")}
-                              className="pl-10 py-6 border-none focus:ring-2 focus:ring-indigo-500"
+                              className="pl-10 py-6 border-none focus:ring-2 focus:ring-main"
+                              aria-label={t("searchPlaceholder")}
                            />
-                           <Button className="absolute right-1 bg-indigo-600 hover:bg-indigo-700">
+                           <Button className="absolute right-1 bg-main hover:bg-main/90">
                               {t("exploreButton")}
                            </Button>
                         </div>
@@ -73,33 +112,39 @@ export const HeroSection = () => {
                   </div>
                </div>
 
-               <div className="hidden lg:flex justify-center relative">
-                  <div className="relative w-full max-w-lg">
-                     <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg blur-lg opacity-75 animate-pulse"></div>
-                     <div className="relative bg-white rounded-lg shadow-xl overflow-hidden p-1">
+               <div className="hidden lg:flex justify-center">
+                  <div className="relative w-full max-w-xl">
+                     <div className="relative bg-white rounded-2xl shadow-lg border border-main/10 p-6">
                         <Image
-                           src={HeroImg}
-                           alt="Smart Eduhub Platform"
-                           className="w-full h-auto"
+                           src="/images/school-building.jpeg"
+                           alt="Smart EduHub campus entrance"
+                           width={600}
+                           height={420}
+                           className="w-full h-auto rounded-xl object-cover"
                            priority
                         />
-                     </div>
 
-                     {/* Floating elements */}
-                     <div className="absolute -top-6 -right-6 bg-white p-4 rounded-lg shadow-lg">
-                        <Badge className="bg-green-100 text-green-800 hover:bg-green-200">
-                           {t("students")}
-                        </Badge>
-                     </div>
-                     <div className="absolute top-1/2 -left-8 bg-white p-4 rounded-lg shadow-lg">
-                        <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200">
-                           {t("teachers")}
-                        </Badge>
-                     </div>
-                     <div className="absolute -bottom-6 -right-2 bg-white p-4 rounded-lg shadow-lg">
-                        <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-200">
-                           {t("parents")}
-                        </Badge>
+                        <div className="grid grid-cols-2 gap-3 mt-6">
+                           <div className="rounded-xl bg-main/5 px-4 py-3">
+                              <p className="text-xs text-slate-500">
+                                 {t("dailyPlan")}
+                              </p>
+                              <p className="text-lg font-semibold text-slate-900">
+                                 {t("weeklyLessons")}
+                              </p>
+                           </div>
+                           <div className="rounded-xl bg-white px-4 py-3 border border-main/10">
+                              <div className="flex items-center gap-2">
+                                 <CalendarCheck2 className="h-5 w-5 text-main" />
+                                 <p className="text-sm font-semibold text-slate-900">
+                                    {t("reminders")}
+                                 </p>
+                              </div>
+                              <p className="text-xs text-slate-600 mt-1">
+                                 {t("remindersCopy")}
+                              </p>
+                           </div>
+                        </div>
                      </div>
                   </div>
                </div>

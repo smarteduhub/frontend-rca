@@ -1,4 +1,3 @@
-//@ts-nocheck
 import React from "react";
 import Link from "next/link";
 import Tilt from "react-parallax-tilt";
@@ -6,20 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { BarChart, GraduationCap, Clock, ChevronRight } from "lucide-react";
 import { CourseProgressTracker } from "@/components/CourseProgressTracker";
-
-export interface CourseData {
-   id: string;
-   title: string;
-   description?: string;
-   category?: string; // Made optional with ?
-   level: string;
-   progress?: number;
-   lastAccessed?: string;
-   teacher?: {
-      id: string;
-      name: string;
-   };
-}
+import type { Course } from "@/types/course";
 
 const levelColorMap: Record<string, string> = {
    beginner: "bg-green-100 text-green-700 border-green-200",
@@ -36,7 +22,11 @@ const categoryIconMap: Record<string, React.ReactNode> = {
    history: <Clock className="h-4 w-4" />,
 };
 
-export const EnrolledCourseCard: React.FC<{ course: CourseData }> = ({
+export interface EnrolledCourseCardProps {
+   course: Course & { progress?: number; lastAccessed?: string };
+}
+
+export const EnrolledCourseCard: React.FC<EnrolledCourseCardProps> = ({
    course,
 }) => {
    const link = `/student/enrolled-courses/${course.id}`;
@@ -91,12 +81,14 @@ export const EnrolledCourseCard: React.FC<{ course: CourseData }> = ({
                         >
                            {course.level}
                         </Badge>
-                        <Badge
-                           variant="outline"
-                           className="bg-blue-50 text-blue-700 border-blue-200 font-medium"
-                        >
-                           {course.category}
-                        </Badge>
+                        {course.category && (
+                           <Badge
+                              variant="outline"
+                              className="bg-blue-50 text-blue-700 border-blue-200 font-medium"
+                           >
+                              {course.category}
+                           </Badge>
+                        )}
                      </div>
 
                      <h3 className="font-bold text-xl mb-3 text-gray-800 line-clamp-2">
@@ -122,7 +114,7 @@ export const EnrolledCourseCard: React.FC<{ course: CourseData }> = ({
 
                      <CourseProgressTracker
                         course={course}
-                        currentProgress={enrollment?.progress || 0}
+                        currentProgress={enrollment?.progress || progress}
                      />
 
                      <div className="mt-auto pt-3 flex items-center justify-between border-t border-gray-100">

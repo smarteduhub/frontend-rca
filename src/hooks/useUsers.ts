@@ -1,76 +1,98 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { authorizedAPI, unauthorizedAPI } from "@/lib/api";
 import handleApiRequest from "@/utils/handleApiRequest";
+import { apiClient } from "@/lib/apiClient";
+import { AdminUserRow } from "@/types/api";
 
-
-interface User {
-   role: any;
-   id: string;
-   name: string;
-   email: string;
-}
+type User = AdminUserRow;
 
 interface UpdateUserData {
-   userId: string;
-   formData: Partial<User>;
+  userId: string;
+  formData: Partial<User>;
 }
 
 const removeUser = (userId: string) => {
-   return handleApiRequest(() =>
-      authorizedAPI.delete(`/users/${userId}`, { withCredentials: true })
-   );
+  return handleApiRequest(() =>
+    authorizedAPI.delete(`/users/${userId}`, { withCredentials: true })
+  );
 };
 
 const modifyUser = ({ userId, formData }: UpdateUserData) => {
-   return handleApiRequest(() =>
-      authorizedAPI.put(`/users/${userId}`, formData, {
-         withCredentials: true,
-      })
-   );
+  return handleApiRequest(() =>
+    authorizedAPI.put(`/users/${userId}`, formData, {
+      withCredentials: true,
+    })
+  );
 };
 
 const fetchUsers = () => {
-   return handleApiRequest(() =>
-      authorizedAPI.get("/users", { withCredentials: true })
-   );
+  return handleApiRequest(() => apiClient.adminListUsers());
+};
+
+const adminActivateUser = (userId: string) => {
+  return apiClient.adminActivateUser(userId);
+};
+
+const adminDeactivateUser = (userId: string) => {
+  return apiClient.adminDeactivateUser(userId);
 };
 
 const fetchUserById = (userId: string) => {
-    return handleApiRequest(() =>
-        authorizedAPI.get(`/users/${userId}`, { withCredentials: true })
-    );
-}
+  return handleApiRequest(() =>
+    authorizedAPI.get(`/users/${userId}`, { withCredentials: true })
+  );
+};
 
 export const useFetchUsers = () => {
-   return useQuery<User[], Error>({
-      queryKey: ["users-by-admin"],
-      queryFn: fetchUsers,
-   });
+  return useQuery<User[], Error>({
+    queryKey: ["users-by-admin"],
+    queryFn: fetchUsers,
+  });
 };
 
 export const useUserById = (userId: string) => {
-    return useQuery<User, Error>({
-        queryKey: ["user-by-id", userId],
-        queryFn: () => fetchUserById(userId),
-})
-}
+  return useQuery<User, Error>({
+    queryKey: ["user-by-id", userId],
+    queryFn: () => fetchUserById(userId),
+  });
+};
 
 export const useRemoveUser = () => {
-   const queryClient = useQueryClient();
-   return useMutation<void, Error, string>({
-      mutationFn: removeUser,
-      onSuccess: () => {
-         queryClient.invalidateQueries({ queryKey: ["users-by-admin"] });
-      },
-   });
+  const queryClient = useQueryClient();
+  return useMutation<void, Error, string>({
+    mutationFn: removeUser,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users-by-admin"] });
+    },
+  });
 };
 
 export const useModifyUser = () => {
-   const queryClient = useQueryClient();
-   return useMutation<void, Error, UpdateUserData>({
-      mutationFn: modifyUser,
-      onSuccess: () => {
-         queryClient.invalidateQueries({ queryKey: ["users-by-admin"] });
-      },
-   });
+  const queryClient = useQueryClient();
+  return useMutation<void, Error, UpdateUserData>({
+    mutationFn: modifyUser,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users-by-admin"] });
+    },
+  });
+};
+
+export const useAdminActivateUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation<void, Error, string>({
+    mutationFn: adminActivateUser,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users-by-admin"] });
+    },
+  });
+};
+
+export const useAdminDeactivateUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation<void, Error, string>({
+    mutationFn: adminDeactivateUser,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users-by-admin"] });
+    },
+  });
 };

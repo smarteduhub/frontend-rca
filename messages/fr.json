@@ -7,6 +7,10 @@
     "loginButton": "Se connecter",
     "registerButton": "S'inscrire",
     "registering": "Inscription en cours...",
+    "activate": "Activate Account",
+    "needActivation": "Have a school code or welcome email?",
+    "activateNow": "Activate your account",
+    "noSelfSignup": "Students do not self-register. Use the activation link from your school.",
     "fullName": "Nom complet",
     "email": "Email",
     "password": "Mot de passe",
@@ -47,69 +51,68 @@
   },
   "home": {
     "hero": {
-      "badge": "Éducation basée sur l'IA",
-      "title": "Smart Eduhub : L'avenir de l'apprentissage personnalisé",
-      "description": "Révolutionnez votre parcours d'apprentissage avec notre plateforme alimentée par l'IA qui s'adapte à votre rythme et style uniques. Libérez votre plein potentiel avec du contenu personnalisé pour les étudiants, les parents, les enseignants et les administrateurs.",
-      "searchPlaceholder": "Rechercher des cours...",
-      "exploreButton": "Explorer",
-      "students": "Étudiants",
-      "teachers": "Enseignants",
-      "parents": "Parents"
+      "badge": "Built with schools and teachers",
+      "title": "Smart EduHub: Your school learning space",
+      "description": "A calm, trusted home for lessons, assignments, and updates so students, teachers, and parents always know what to do next.",
+      "searchPlaceholder": "Search your subjects or classes",
+      "exploreButton": "Find class",
+      "students": "Students",
+      "teachers": "Teachers",
+      "parents": "Parents",
+      "studentsDesc": "See today’s lessons, submit work, and track your progress.",
+      "teachersDesc": "Share resources, set assignments, and give quick feedback.",
+      "parentsDesc": "Check grades, attendance, and notes from teachers.",
+      "dailyPlan": "Daily plan",
+      "weeklyLessons": "5 lessons scheduled",
+      "reminders": "Reminders are on",
+      "remindersCopy": "Stay ahead of due dates and tests."
     },
     "features": {
-      "title": "Fonctionnalités de la Plateforme",
-      "subtitle": "La Technologie qui Transforme l'Apprentissage",
-      "description": "Smart Eduhub combine l'intelligence artificielle de pointe avec des méthodologies éducatives éprouvées pour créer un environnement d'apprentissage adaptatif qui répond aux besoins uniques de chaque étudiant.",
-      "aiLearning": {
-        "title": "Apprentissage par IA",
-        "description": "Des algorithmes avancés analysent les modèles d'apprentissage de chaque étudiant pour fournir un contenu personnalisé qui s'adapte en temps réel à leurs progrès et besoins."
+      "title": "Built for your school community",
+      "subtitle": "One place where everyone knows what to do next",
+      "description": "Students, teachers, and parents share the same simple schedule, assignments, and messages.",
+      "studentHub": {
+        "title": "Students stay on track",
+        "description": "Check lessons, submit work, and see feedback in one calm space."
       },
-      "analytics": {
-        "title": "Analyses Complètes",
-        "description": "Des tableaux de bord détaillés fournissent des aperçus exploitables des performances, mettant en évidence les forces et identifiant les domaines nécessitant une attention supplémentaire."
+      "teacherTools": {
+        "title": "Teachers get time back",
+        "description": "Share resources, collect assignments, and track progress quickly."
       },
-      "multiRole": {
-        "title": "Plateforme Multi-rôles",
-        "description": "Des interfaces spécialisées pour les étudiants, les parents, les enseignants et les administrateurs avec des fonctionnalités conçues spécifiquement pour les besoins de chaque utilisateur."
+      "parentAccess": {
+        "title": "Parents stay informed",
+        "description": "See attendance, grades, and teacher notes without needing extra calls."
       },
-      "curriculum": {
-        "title": "Aligné sur le Programme",
-        "description": "Contenu adapté aux normes éducatives nationales assurant que les étudiants reçoivent une instruction complète qui les prépare aux tests standardisés et au-delà."
-      },
-      "feedback": {
-        "title": "Retour Instantané",
-        "description": "L'évaluation et le retour en temps réel pendant les activités d'apprentissage aident les étudiants à comprendre les concepts immédiatement plutôt que d'attendre une notation traditionnelle."
-      },
-      "scheduling": {
-        "title": "Planification Flexible",
-        "description": "Apprenez n'importe quand, n'importe où avec un accès à la demande aux leçons, permettant aux étudiants de progresser à leur propre rythme tout en maintenant leur responsabilité."
+      "safeSpace": {
+        "title": "Safe, school-managed access",
+        "description": "Accounts come from your school with clear permissions and sign-in rules."
       }
     },
     "benefits": {
-      "title": "Pourquoi Choisir Smart Eduhub",
-      "subtitle": "Transformer l'Éducation par la Technologie",
-      "description": "Smart Eduhub combine l'IA de pointe avec des méthodologies éducatives éprouvées pour offrir des expériences d'apprentissage personnalisées qui aident les étudiants à atteindre leur plein potentiel tout en donnant aux éducateurs des outils puissants pour maximiser leur impact.",
+      "title": "Why schools choose Smart EduHub",
+      "subtitle": "Simple, supportive, ready for class",
+      "description": "Designed with teachers and students to keep lessons, assignments, and updates in one warm place.",
       "personalized": {
-        "title": "Apprentissage Personnalisé",
-        "description": "Notre technologie IA s'adapte au style d'apprentissage, au rythme et aux préférences de chaque étudiant, créant des expériences éducatives vraiment personnalisées qui améliorent la rétention et les résultats."
+        "title": "Clear daily plan",
+        "description": "Students see what is due today, what is coming next, and how to prepare."
       },
       "analytics": {
-        "title": "Analyses de Performance",
-        "description": "Obtenez des aperçus complets des progrès académiques avec des tableaux de bord d'analyse détaillés pour les étudiants, les parents, les enseignants et les administrateurs pour suivre la croissance en temps réel."
+        "title": "Teachers teach, not chase",
+        "description": "Post lessons once, gather work easily, and spot who needs help."
       },
       "content": {
-        "title": "Contenu Engageant",
-        "description": "Accédez à des leçons interactives, des vidéos, des quiz et des simulations conçus par des experts en éducation pour rendre l'apprentissage agréable tout en obtenant de meilleurs résultats académiques."
+        "title": "Parents stay in the loop",
+        "description": "Quick views of attendance, grades, and messages keep families informed."
       },
       "improvement": {
-        "title": "Amélioration Continue",
-        "description": "Notre plateforme évolue avec chaque étudiant, affinant constamment les recommandations et les parcours d'apprentissage basés sur les données de performance et les dernières recherches éducatives."
+        "title": "Safe and school-ready",
+        "description": "Secure accounts, clear roles, and simple language students can trust."
       }
     },
     "courses": {
       "title": "COURS EN VEDETTE",
-      "subtitle": "Découvrez Votre Prochaine Aventure d'Apprentissage",
-      "description": "Explorez nos cours alimentés par l'IA conçus pour s'adapter à votre style d'apprentissage et vous aider à maîtriser de nouvelles compétences à votre rythme.",
+      "subtitle": "Class resources picked for you",
+      "description": "Explore lessons and practice tasks prepared by your teachers and school partners.",
       "loading": "Chargement des cours...",
       "error": "Une erreur s'est produite lors du chargement des cours. Veuillez réessayer plus tard.",
       "viewCourse": "Voir le Cours",
@@ -124,12 +127,11 @@
     }
   },
   "navbar": {
-    "courses": "Cours",
-    "about": "À propos",
-    "contact": "Contact",
+    "home": "Home",
+    "about": "About",
     "dashboard": "Tableau de bord",
     "login": "Connexion",
-    "register": "S'inscrire",
+    "activate": "Activate Account",
     "language": {
       "english": "EN",
       "french": "FR",
@@ -268,6 +270,7 @@
       "enrolledCourses": "Cours inscrits",
       "users": "Utilisateurs",
       "assignments": "Devoirs",
+      "quizzes": "Quiz",
       "games":"jeux",
       "chat": "Discussion",
       "schedule": "Emploi du temps",

@@ -5,13 +5,14 @@ import { Marquee } from "@devnomic/marquee";
 import "@devnomic/marquee/dist/index.css";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslations } from "next-intl";
+import * as icons from "lucide-react";
 
-interface sponsorsProps {
-  icon: keyof typeof import("lucide-react");
+interface SponsorProps {
+  icon: keyof typeof icons;
   name: string;
 }
 
-const sponsors: sponsorsProps[] = [
+const sponsors: SponsorProps[] = [
   {
     icon: "Crown",
     name: "Acmebrand",
@@ -63,7 +64,6 @@ export const SponsorsSection = () => {
             {sponsors.map(({ icon, name }) => (
               <Card key={name} className="hover:shadow-lg transition-shadow">
                 <CardHeader className="flex flex-row items-center space-x-4">
-                  {/* @ts-ignore */}
                   <Icon
                     name={icon}
                     className="w-8 h-8 text-blue-600 dark:text-blue-400"

@@ -1,16 +1,19 @@
-// store/useAuthStore.ts
+/**
+ * Auth Store - Global authentication state
+ * 
+ * Manages:
+ * - Current user data
+ * - Authentication status
+ * 
+ * Persists to localStorage (survives page refresh).
+ * Updated by auth hooks (useLoginUser, useLogoutUser, etc.)
+ * 
+ * Usage: const { user, isAuthenticated } = useAuthStore();
+ */
+
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-
-export interface User {
-   id: string;
-   name: string;
-   email: string;
-   role: string;
-   phone?: string;
-   address?: string;
-   // Add any other relevant fields
-}
+import type { User } from "@/types/user";
 
 interface AuthState {
    user: User | null;
@@ -23,6 +26,7 @@ interface AuthState {
 export const useAuthStore = create(
    persist<AuthState>(
       (set) => ({
+         // No hardcoded user - initialized from token/cookies only
          user: null,
          isAuthenticated: false,
          setUser: (user: User | null) => set({ user, isAuthenticated: !!user }),
@@ -35,3 +39,9 @@ export const useAuthStore = create(
       }
    )
 );
+
+
+
+
+
+

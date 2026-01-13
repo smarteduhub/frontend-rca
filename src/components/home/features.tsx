@@ -1,53 +1,40 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  BrainCircuit, 
-  BarChart3, 
-  Users, 
-  GraduationCap, 
-  MessageCircle, 
-  CalendarClock 
+import {
+   ClipboardCheck,
+   MessageSquare,
+   NotebookPen,
+   ShieldCheck,
 } from "lucide-react";
-import { ReactNode } from "react";
 import { useTranslations } from "next-intl";
 
 export const FeaturesSection = () => {
-  const t = useTranslations("home.features");
+   const t = useTranslations("home.features");
 
-  const featureList = [
-    {
-      icon: <BrainCircuit className="h-6 w-6" />,
-      title: t("aiLearning.title"),
-      description: t("aiLearning.description"),
-    },
-    {
-      icon: <BarChart3 className="h-6 w-6" />,
-      title: t("analytics.title"),
-      description: t("analytics.description"),
-    },
-    {
-      icon: <Users className="h-6 w-6" />,
-      title: t("multiRole.title"),
-      description: t("multiRole.description"),
-    },
-    {
-      icon: <GraduationCap className="h-6 w-6" />,
-      title: t("curriculum.title"),
-      description: t("curriculum.description"),
-    },
-    {
-      icon: <MessageCircle className="h-6 w-6" />,
-      title: t("feedback.title"),
-      description: t("feedback.description"),
-    },
-    {
-      icon: <CalendarClock className="h-6 w-6" />,
-      title: t("scheduling.title"),
-      description: t("scheduling.description"),
-    },
-  ];
+   const featureList = [
+      {
+         icon: <NotebookPen className="h-6 w-6" />,
+         title: t("studentHub.title"),
+         description: t("studentHub.description"),
+      },
+      {
+         icon: <ClipboardCheck className="h-6 w-6" />,
+         title: t("teacherTools.title"),
+         description: t("teacherTools.description"),
+      },
+      {
+         icon: <MessageSquare className="h-6 w-6" />,
+         title: t("parentAccess.title"),
+         description: t("parentAccess.description"),
+      },
+      {
+         icon: <ShieldCheck className="h-6 w-6" />,
+         title: t("safeSpace.title"),
+         description: t("safeSpace.description"),
+      },
+   ];
 
   return (
-    <section id="features" className="bg-blue-50 py-24 sm:py-32">
+    <section id="features" className="bg-sky-50 py-24 sm:py-32">
       <div className="container mx-auto px-4">
         <h2 className="text-lg text-main text-center mb-2 tracking-wider font-medium">
           {t("title")}
@@ -61,19 +48,19 @@ export const FeaturesSection = () => {
           {t("description")}
         </h3>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-6">
           {featureList.map(({ icon, title, description }) => (
             <div key={title}>
               <Card className="h-full bg-white border border-blue-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all duration-300">
-                <CardHeader className="flex justify-center items-center pb-2">
-                  <div className="bg-gradient-to-r from-main to-indigo-600 p-4 rounded-lg text-white mb-6">
+                <CardHeader className="flex gap-4 items-start pb-2">
+                  <div className="bg-main/10 p-3 rounded-lg text-main mb-2">
                     {icon}
                   </div>
 
                   <CardTitle className="text-xl text-gray-900">{title}</CardTitle>
                 </CardHeader>
 
-                <CardContent className="text-gray-600 text-center">
+                <CardContent className="text-gray-600 text-left">
                   {description}
                 </CardContent>
               </Card>

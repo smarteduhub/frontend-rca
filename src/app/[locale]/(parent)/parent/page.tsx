@@ -1,266 +1,232 @@
 "use client";
+
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-   Book,
-   Pen,
-   Star,
-   Calendar,
-   Bell,
-   BarChart3,
-   PieChart,
-   Loader2,
-} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
-import {
-   LineChart,
-   Line,
-   BarChart,
-   Bar,
-   XAxis,
-   YAxis,
-   CartesianGrid,
-   Tooltip,
-   Legend,
-   ResponsiveContainer,
-   PieChart as RechartPieChart,
-   Pie,
-   Cell,
-} from "recharts";
-import DashboardNavbar from "@/components/DashboardNavbar";
-import CustomCard from "@/components/CustomCard";
-import ParentLineChart from "@/components/parent/ParentLineChart";
-import ParentBarChart from "@/components/parent/ParentBarChart";
 import { useChildren, useChildDetails } from "@/hooks/useParent";
-import { EnrolledCourseCard } from "@/components/student/EnrolledCourseCard";
-
-const activityData = [
-   { name: "Completed", value: 68, color: "#979205" },
-   { name: "In Progress", value: 23, color: "#FEB185" },
-   { name: "Not Started", value: 9, color: "#8495B2" },
-];
-
-const cardData = [
-   {
-      icon: Book,
-      desc: "Child's Enrolled Courses",
-      title: `${4} Courses`,
-      color: "#979205",
-   },
-   {
-      icon: Star,
-      desc: "Average Performance",
-      title: "87%",
-      color: "#FEB185",
-   },
-   {
-      icon: Pen,
-      desc: "Pending Assignments",
-      title: `${5} Tasks`,
-      color: "#8495B2",
-   },
-   {
-      icon: Calendar,
-      desc: "Attendance Rate",
-      title: "95%",
-      color: "#311D4A",
-   },
-];
+import { useParentOverview } from "@/hooks/usePersonalized";
 
 const ParentHome = () => {
-   const upcomingEvents = [
-      {
-         title: "Parent-Teacher Meeting",
-         date: "March 2, 2025",
-         time: "5:00 PM",
-      },
-      {
-         title: "Science Fair Project Due",
-         date: "March 10, 2025",
-         time: "3:30 PM",
-      },
-      { title: "Spring Break Begins", date: "March 15, 2025", time: "All Day" },
-   ];
-
-   const recentNotifications = [
-      { message: "Emma completed Math Quiz with 92%", time: "2 hours ago" },
-      { message: "New assignment added in Science", time: "Yesterday" },
-      { message: "Term project guidelines updated", time: "2 days ago" },
-   ];
-
    const { data: children } = useChildren();
-   const { data: childDetails, isLoading } = useChildDetails(
-      children?.[0]?.id || ""
-   );
+   const firstChild = children?.[0];
+   const { data: childDetails } = useChildDetails(firstChild?.id || "");
+   const { children: parentChildren, events } = useParentOverview();
+
+   const childName = firstChild?.name || "Your child";
+   const yearStream =
+      (childDetails?.year && childDetails?.stream
+         ? `${childDetails.year} ${childDetails.stream}`
+         : childDetails?.year || childDetails?.stream || "Year info loading");
+
+   const attendancePercent =
+      childDetails?.attendance?.percentage ??
+      childDetails?.attendancePercentage ??
+      null;
+
+   const courses =
+      (childDetails?.courses as Array<
+         { id?: string; title?: string; status?: string }
+      >) || [];
+
+   const upcoming = childDetails?.upcoming || [
+      { title: "Today’s classes load automatically", when: "Today" },
+   ];
+
+   const messages =
+      childDetails?.messages || [
+         { title: "No new messages", from: "School", detail: "" },
+      ];
+
+   const upcomingEvents = events.data || [];
+
+   const overallStatus =
+      childDetails?.overallStatus ||
+      (attendancePercent && attendancePercent >= 90
+         ? "On track"
+         : attendancePercent && attendancePercent < 75
+         ? "Needs attention"
+         : "Good progress");
+
+   const overallNote =
+      childDetails?.overallNote ||
+      "You are viewing your child’s academic information. Nothing you do here will change their records.";
 
    return (
-      <div className="p-3">
-         {/* Dashboard Header */}
-         <DashboardNavbar title="Parent" />
-
-         {/* Child's Progress */}
-         <div className="flex flex-col gap-2 w-full md:w-[40%] my-6">
-            <div className="flex justify-between items-center">
-               <h4 className="font-medium">Overall Progress</h4>
-               <span className="text-sm text-gray-500">87% Complete</span>
+      <div className="space-y-6">
+         {/* Child overview */}
+         <Card className="border-slate-200 bg-white">
+            <CardHeader>
+               <CardTitle className="text-2xl font-semibold text-slate-900">
+                  {childName}
+               </CardTitle>
+               <p className="text-lg text-slate-700">{yearStream}</p>
+            </CardHeader>
+            <CardContent className="space-y-3">
+               <div className="rounded-md bg-slate-50 border border-slate-100 p-3">
+                  <p className="text-base font-semibold text-slate-900">
+                     Status: {overallStatus}
+                  </p>
+                  <p className="text-slate-700 text-base">{overallNote}</p>
             </div>
-            <Progress
-               value={87}
-               className="h-2"
-            />
-         </div>
+               <p className="text-sm text-slate-600">
+                  You cannot change grades or records here. This is a safe, read-only
+                  view.
+               </p>
+            </CardContent>
+         </Card>
 
-         {/* Summary Cards */}
-         <section className="grid w-full grid-cols-1 gap-4 gap-x-8 transition-all sm:grid-cols-2 xl:grid-cols-4 mb-6">
-            {cardData.map((d, i) => (
-               <CustomCard
-                  key={i}
-                  color={d.color}
-                  icon={d.icon}
-                  desc={d.desc}
-                  title={d.title}
-               />
-            ))}
-         </section>
+         {/* Attendance summary */}
+         <Card className="border-slate-200 bg-white">
+            <CardHeader>
+               <CardTitle className="text-xl text-slate-900">
+                  Attendance
+               </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2 text-base text-slate-800">
+               {attendancePercent !== null ? (
+                  <>
+                     <p>
+                        Attendance: {attendancePercent}% this month. Your child attended{" "}
+                        {childDetails?.attendance?.attended ??
+                           childDetails?.attendanceCount ??
+                           "—"}{" "}
+                        out of{" "}
+                        {childDetails?.attendance?.total ??
+                           childDetails?.totalClasses ??
+                           "—"}{" "}
+                        classes.
+                     </p>
+                     <p className="text-slate-700">
+                        If attendance drops below expectations, we will notify you.
+                     </p>
+                  </>
+               ) : (
+                  <p>Attendance data will appear here. No action needed.</p>
+               )}
+            </CardContent>
+         </Card>
 
-         {/* Charts Section */}
-         <section className="rounded-lg mt-6 flex gap-6 flex-col md:flex-row">
-            <ParentLineChart />
-            <ParentBarChart />
-         </section>
-
-         {/* Activity and Upcoming Events */}
-         <section className="my-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="border p-4 rounded-lg col-span-1">
-               <h3 className="font-medium mb-4">Assignment Completion</h3>
-               <div className="h-64">
-                  <ResponsiveContainer
-                     width="100%"
-                     height="100%"
-                  >
-                     <RechartPieChart>
-                        <Pie
-                           data={activityData}
-                           cx="50%"
-                           cy="50%"
-                           innerRadius={60}
-                           outerRadius={80}
-                           paddingAngle={5}
-                           dataKey="value"
+         {/* Academic progress simplified */}
+         <Card className="border-slate-200 bg-white">
+            <CardHeader>
+               <CardTitle className="text-xl text-slate-900">
+                  Academic progress
+               </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+               {courses.length === 0 ? (
+                  <p className="text-base text-slate-700">
+                     Subjects will appear here. You will see a simple status like “Good”
+                     or “Needs support.”
+                  </p>
+               ) : (
+                  courses.map((course) => {
+                     const status = (course as any).status || "Good";
+                     const color =
+                        status.toLowerCase() === "needs support"
+                           ? "text-red-700"
+                           : status.toLowerCase().includes("improv")
+                           ? "text-amber-700"
+                           : "text-green-700";
+                     return (
+                        <div
+                           key={course.id || course.title}
+                           className="flex items-center justify-between rounded-md border border-slate-100 px-3 py-2"
                         >
-                           {activityData.map((entry, index) => (
-                              <Cell
-                                 key={`cell-${index}`}
-                                 fill={entry.color}
-                              />
-                           ))}
-                        </Pie>
-                        <Tooltip />
-                        <Legend />
-                     </RechartPieChart>
-                  </ResponsiveContainer>
+                           <div className="text-base text-slate-900">
+                              {course.title || "Subject"}
+                           </div>
+                           <div className={`text-base font-semibold ${color}`}>
+                              {status}
                </div>
             </div>
+                     );
+                  })
+               )}
+            </CardContent>
+         </Card>
 
-            <div className="border p-4 rounded-lg col-span-1">
-               <div className="flex items-center justify-between w-full mb-4">
-                  <h3 className="font-medium">Upcoming Events</h3>
-                  <Button
-                     variant="outline"
-                     size="sm"
-                  >
-                     View All
-                  </Button>
-               </div>
-               <div className="space-y-4">
-                  {upcomingEvents.map((event, i) => (
+         {/* Upcoming schedule */}
+         <Card className="border-slate-200 bg-white">
+            <CardHeader>
+               <CardTitle className="text-xl text-slate-900">
+                  Upcoming schedule
+               </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2 text-base text-slate-800">
+               {(upcomingEvents.length ? upcomingEvents : upcoming).map(
+                  (item: any, idx: number) => (
                      <div
-                        key={i}
-                        className="flex items-start gap-3 p-2 hover:bg-gray-50 rounded-md"
+                        key={item.title || idx}
+                        className="rounded-md border border-slate-100 px-3 py-2"
                      >
-                        <Calendar className="h-5 w-5 text-blue-600 mt-1" />
-                        <div>
-                           <p className="font-medium">{event.title}</p>
-                           <p className="text-sm text-gray-500">
-                              {event.date} • {event.time}
+                        <p className="font-semibold text-slate-900">
+                           {item.title || "Class details loading"}
+                        </p>
+                        <p className="text-slate-700">
+                           {item.when ||
+                              (item.start_time
+                                 ? new Date(item.start_time).toLocaleString()
+                                 : "Date/time to follow")}
                            </p>
                         </div>
+                  )
+               )}
+            </CardContent>
+         </Card>
+
+         {/* Teacher messages & announcements */}
+         <Card className="border-slate-200 bg-white">
+            <CardHeader>
+               <CardTitle className="text-xl text-slate-900">
+                  Messages & announcements
+               </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2 text-base text-slate-800">
+               {messages.map((msg: any, idx: number) => (
+                  <div
+                     key={msg.title || idx}
+                     className="rounded-md border border-slate-100 px-3 py-2"
+                  >
+                     <p className="font-semibold text-slate-900">
+                        {msg.title || "Message"}
+                     </p>
+                     <p className="text-slate-700">
+                        {msg.from ? `From: ${msg.from}` : "From school"}
+                     </p>
+                     {msg.detail && (
+                        <p className="text-slate-700 mt-1">{msg.detail}</p>
+                     )}
                      </div>
                   ))}
-               </div>
-            </div>
+            </CardContent>
+         </Card>
 
-            <div className="border p-4 rounded-lg col-span-1">
-               <div className="flex items-center justify-between w-full mb-4">
-                  <h3 className="font-medium">Recent Notifications</h3>
-                  <Button
-                     variant="outline"
-                     size="sm"
-                  >
-                     View All
-                  </Button>
-               </div>
-               <div className="space-y-4">
-                  {recentNotifications.map((notification, i) => (
-                     <div
-                        key={i}
-                        className="flex items-start gap-3 p-2 hover:bg-gray-50 rounded-md"
-                     >
-                        <Bell className="h-5 w-5 text-blue-600 mt-1" />
-                        <div>
-                           <p className="font-medium">{notification.message}</p>
-                           <p className="text-sm text-gray-500">
-                              {notification.time}
-                           </p>
-                        </div>
-                     </div>
-                  ))}
-               </div>
-            </div>
-         </section>
-
-         {/* Child's Courses */}
-         <section className="my-6">
-            <div className="flex items-center justify-between w-full my-4">
-               <h3 className="font-medium">Child&apos;s Courses</h3>
-               <Link href="/parent/child">
-                  <Button
-                     className="text-blue-600"
-                     variant="outline"
-                  >
-                     View All
+         {/* Communication */}
+         <Card className="border-slate-200 bg-white">
+            <CardHeader>
+               <CardTitle className="text-xl text-slate-900">
+                  Contact the teacher
+               </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-base text-slate-800">
+               <p className="text-slate-700">
+                  Send a message or request a meeting. You cannot change grades or
+                  student data.
+               </p>
+               <div className="flex flex-wrap gap-2">
+                  <Link href="/parent/messages">
+                     <Button className="text-base">Send a message</Button>
+                  </Link>
+                  <Link href="/parent/meetings">
+                     <Button variant="outline" className="text-base">
+                        Request a meeting
                   </Button>
                </Link>
             </div>
-            <div className="flex flex-wrap -mx-4">
-               {isLoading ? (
-                  <div className="w-full flex items-center justify-center py-12">
-                     <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
-                     <span className="ml-3 text-gray-600">
-                        Loading courses...
-                     </span>
-                  </div>
-               ) : !childDetails?.enrolledCourses?.length ? (
-                  <div className="w-full text-center py-12 text-gray-500">
-                     No courses enrolled yet.
-                  </div>
-               ) : (
-                  childDetails.enrolledCourses.slice(0, 3).map((course) => (
-                     <EnrolledCourseCard
-                        key={course.id}
-                        course={{
-                           ...course,
-                           level: course.grade || "Not Set",
-                           progress: course.progress || 0,
-                           category: "other", // Add a default category
-                        }}
-                     />
-                  ))
-               )}
-            </div>
-         </section>
+            </CardContent>
+         </Card>
       </div>
    );
 };

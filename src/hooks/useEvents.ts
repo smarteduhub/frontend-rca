@@ -11,6 +11,9 @@ export interface Event {
    color?: string;
    description?: string;
    user_id: string;
+   has_reminder?: boolean; // Whether reminder is enabled
+   reminder_time?: string; // When to remind (datetime)
+   reminder_sent?: boolean; // Whether reminder was sent
 }
 
 export interface EventCreateData {
@@ -20,6 +23,8 @@ export interface EventCreateData {
    color?: string;
    description?: string;
    user_id?: string; // Only used by admins
+   has_reminder?: boolean; // Whether reminder is enabled
+   reminder_time?: string; // When to remind (datetime)
 }
 
 export interface EventUpdateData {

@@ -1,4 +1,15 @@
-//@ts-nocheck
+/**
+ * Courses Section - Landing page course carousel
+ * 
+ * Fetches courses using useGetAllCourses() hook.
+ * Displays courses in an autoplay carousel with:
+ * - Course title, description, category, level
+ * - Teacher information
+ * - Link to course details page
+ * 
+ * Shows loading state while fetching, error state on failure.
+ */
+
 "use client";
 import React from "react";
 import Tilt from "react-parallax-tilt";
@@ -21,18 +32,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useTranslations } from "next-intl";
-
-interface CourseData {
-   id: string;
-   title: string;
-   description?: string;
-   category: string;
-   level: string;
-   teacher?: {
-      id: string;
-      name: string;
-   };
-}
+import type { Course } from "@/types/course";
 
 const levelColorMap: Record<string, string> = {
    beginner: "bg-green-100 text-green-700 border-green-200",
@@ -49,7 +49,7 @@ const categoryIconMap: Record<string, React.ReactNode> = {
    history: <Clock className="h-4 w-4" />,
 };
 
-const CourseCard: React.FC<{ course: CourseData }> = ({ course }) => {
+const CourseCard: React.FC<{ course: Course }> = ({ course }) => {
    const t = useTranslations("home.courses");
    const link = `/courses/${course.id}`;
 
@@ -137,12 +137,14 @@ const CourseCard: React.FC<{ course: CourseData }> = ({ course }) => {
 
 const CoursesSection = () => {
    const t = useTranslations("home.courses");
+   // Optimize: Only fetch first 6 courses for landing page
    const { data: courses, isLoading, error } = useGetAllCourses();
    const plugin = React.useRef(
       Autoplay({ delay: 4000, stopOnInteraction: true })
    );
 
-   const displayCourses = courses?.length ? courses : [];
+   // Limit courses to 6 for better performance
+   const displayCourses = courses?.slice(0, 6) || [];
 
    return (
       <section
@@ -183,7 +185,7 @@ const CoursesSection = () => {
                   }}
                >
                   <CarouselContent>
-                     {displayCourses.map((course: CourseData) => (
+                     {displayCourses.map((course) => (
                         <CourseCard
                            key={course.id}
                            course={course}

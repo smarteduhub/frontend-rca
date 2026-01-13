@@ -9,18 +9,28 @@ interface AuthProviderProps {
    children: ReactNode;
 }
 
-const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-   const { setUser, setIsAuthenticated } = useAuthStore();
-   const [loading, setLoading] = useState(true);
+interface DecodedToken {
+   id?: string;
+   email?: string;
+   role?: string;
+   exp?: number;
+}
 
-   const fetchUserData = async () => {
+const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+   const { setUser, setIsAuthenticated, user: storedUser } = useAuthStore();
+   const [loading, setLoading] = useState(true);
+   const [showLoading, setShowLoading] = useState(false);
+
+   // Initialize auth state from token on component mount - OPTIMIZED
+   const initializeAuth = async () => {
       try {
+         // Extract token from cookies - FAST synchronous operation
          const token = document.cookie
             .split("; ")
             .find((row) => row.startsWith("access_token="))
             ?.split("=")[1];
 
-         // If no token is found, just set authenticated to false and continue
+         // If no token exists, user is not authenticated - FAST EXIT
          if (!token) {
             setIsAuthenticated(false);
             setLoading(false);
@@ -28,68 +38,65 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
          }
 
          try {
-            const decodedToken: any = jwtDecode(token);
+            // Decode the JWT token - FAST synchronous operation
+            const decodedToken = jwtDecode<DecodedToken>(token);
 
-            // If token is invalid or missing ID, handle as unauthenticated
-            if (!decodedToken.id) {
+            // Check if token has required fields and hasn't expired
+            if (!decodedToken.id || !decodedToken.role) {
                setIsAuthenticated(false);
                setLoading(false);
                return;
             }
 
-            // Fetch full user details from API
-            const response = await authorizedAPI.get(
-               `/users/${decodedToken.id}`
-            );
-            const userData = response.data;
+            // Check token expiration
+            if (decodedToken.exp && decodedToken.exp < Date.now() / 1000) {
+               setIsAuthenticated(false);
+               setLoading(false);
+               return;
+            }
 
+            // Use decoded token immediately - DON'T BLOCK ON API CALL
             setUser({
-               id: userData.id,
-               name: userData.name,
-               email: userData.email,
-               role: userData.role,
+               id: decodedToken.id,
+               name: decodedToken.email?.split("@")[0] || "User",
+               email: decodedToken.email || "",
+               role: decodedToken.role,
             });
-
             setIsAuthenticated(true);
-         } catch (tokenError) {
-            // Invalid token or decode error, handle as unauthenticated
+            setLoading(false);
+
+            // Fetch full profile in background (non-blocking)
+            authorizedAPI.get(`/users/profile`)
+               .then((response) => {
+                  const userData = response.data;
+                  setUser({
+                     id: userData.id,
+                     name: userData.name,
+                     email: userData.email,
+                     role: userData.role,
+                  });
+               })
+               .catch(() => {
+                  // Silent fail - we already have token data
+               });
+         } catch (decodeError) {
+            console.error("Token decode error:", decodeError);
             setIsAuthenticated(false);
+            setLoading(false);
          }
       } catch (error) {
-         // API or network error
+         console.error("Auth initialization error:", error);
          setIsAuthenticated(false);
-      } finally {
          setLoading(false);
       }
    };
 
+   // Run initialization on component mount
    useEffect(() => {
-      fetchUserData();
+      initializeAuth();
    }, []);
 
-   // Optional: Show loading state only if it takes longer than a threshold
-   const [showLoading, setShowLoading] = useState(false);
-
-   useEffect(() => {
-      const timer = setTimeout(() => {
-         if (loading) {
-            setShowLoading(true);
-         }
-      }, 500); // Show loading spinner after 500ms
-
-      return () => clearTimeout(timer);
-   }, [loading]);
-
-   if (loading && showLoading) {
-      return (
-         <div className="items-center justify-center flex min-h-screen">
-            <div className="text-center">
-               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-main mx-auto"></div>
-               <p className="mt-4 text-main">Loading...</p>
-            </div>
-         </div>
-      );
-   }
+   // Don't show loading spinner - render immediately with token data
 
    return <>{children}</>;
 };

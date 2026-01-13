@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useMemo } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import logo from "@/images/logo.svg";
@@ -8,20 +8,22 @@ import {
    Bell,
    Book,
    Calendar,
-   ChartArea,
    House,
    LogOut,
-   MessageCircleCode,
+   MessageSquare,
    Settings,
    User,
-   User2,
    Users,
    Briefcase,
-   BookOpenCheck,
-   MessageSquare,
-   Brain,
    NotebookText,
-   GamepadIcon,
+   ClipboardList,
+   GraduationCap,
+   HelpCircle,
+   Sparkles,
+   FileText,
+   CheckCircle2,
+   HeartHandshake,
+   BarChart3,
 } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useLogoutUser } from "@/hooks/useAuth";
@@ -34,13 +36,8 @@ interface SidebarProps {
 const DashboardSidebar = ({ role }: SidebarProps) => {
    const t = useTranslations("dashboard");
    const { user } = useAuthStore();
-   const [isCollapsed, setIsCollapsed] = useState(false);
    const pathname = usePathname();
    const logout = useLogoutUser();
-
-   const toggleSidebar = () => {
-      setIsCollapsed(!isCollapsed);
-   };
 
    const handleLogout = async () => {
       try {
@@ -60,180 +57,194 @@ const DashboardSidebar = ({ role }: SidebarProps) => {
       return pathname.includes(link);
    };
 
-   // Define navigation links based on the role
-   const links = {
-      admin: [
-         { icon: <House />, label: t("menu.dashboard"), link: "/admin" },
-         { icon: <User />, label: t("menu.profile"), link: "/admin/profile" },
-         { icon: <Book />, label: t("menu.courses"), link: "/admin/courses" },
-         { icon: <User2 />, label: t("menu.users"), link: "/admin/users" },
+   const teacherNav = useMemo(
+      () => [
          {
-            icon: <NotebookText />,
-            label: t("menu.assignments"),
-            link: "/admin/assignments",
+            heading: "Teaching",
+            items: [
+               { icon: <House />, label: "Dashboard", link: "/teacher" },
+               { icon: <Briefcase />, label: "Courses", link: "/teacher/courses" },
+               { icon: <NotebookText />, label: "Assignments", link: "/teacher/assignments" },
+               { icon: <Users />, label: "Students", link: "/teacher/students" },
+               { icon: <ClipboardList />, label: "Attendance", link: "/teacher/attendance" },
+               { icon: <GraduationCap />, label: "Grades", link: "/teacher/grades" },
+            ],
          },
          {
-            icon: <MessageCircleCode />,
-            label: t("menu.chat"),
-            link: "/admin/chat",
+            heading: "Planning & Communication",
+            items: [
+               { icon: <Calendar />, label: "Schedule", link: "/teacher/schedule" },
+               { icon: <MessageSquare />, label: "Messages", link: "/teacher/messages" },
+               { icon: <Bell />, label: "Announcements", link: "/teacher/announcements" },
+               { icon: <Sparkles />, label: "AI Assistant", link: "/teacher/ai-assistant" },
+            ],
          },
          {
-            icon: <Bell />,
-            label: t("menu.notifications"),
-            link: "/admin/notifications",
-         },
-         {
-            icon: <Calendar />,
-            label: t("menu.schedule"),
-            link: "/admin/schedule",
-         },
-         {
-            icon: <Settings />,
-            label: t("menu.settings"),
-            link: "/admin/settings",
+            heading: "Account",
+            items: [
+               { icon: <User />, label: "Profile", link: "/teacher/profile" },
+               { icon: <Settings />, label: "Settings", link: "/teacher/settings" },
+               { icon: <HelpCircle />, label: "Help", link: "/teacher/help" },
+            ],
          },
       ],
-      student: [
-         { icon: <House />, label: t("menu.home"), link: "/student" },
-         { icon: <User />, label: t("menu.profile"), link: "/student/profile" },
-         { icon: <Book />, label: t("menu.courses"), link: "/student/courses" },
+      []
+   );
+
+   const studentNav = useMemo(
+      () => [
          {
-            icon: <BookOpenCheck />,
-            label: t("menu.enrolledCourses"),
-            link: "/student/enrolled-courses",
+            heading: "Learning",
+            items: [
+               { icon: <House />, label: "Dashboard", link: "/student" },
+               { icon: <Book />, label: "My Courses", link: "/student/enrolled-courses" },
+               { icon: <NotebookText />, label: "Assignments", link: "/student/assignments" },
+               { icon: <GraduationCap />, label: "Grades", link: "/student/grades" },
+               { icon: <FileText />, label: "Reports", link: "/student/reports" },
+               { icon: <Calendar />, label: "Timetable", link: "/student/timetable" },
+            ],
          },
          {
-            icon: <NotebookText />,
-            label: t("menu.assignments"),
-            link: "/student/assignments",
+            heading: "Engagement",
+            items: [
+               { icon: <MessageSquare />, label: "Messages", link: "/student/chat" },
+               { icon: <Sparkles />, label: "AI Study Assistant", link: "/student/ai-chat" },
+               { icon: <Bell />, label: "Announcements", link: "/student/announcements" },
+               { icon: <GraduationCap />, label: "Gamified Learning", link: "/student/gamified-learning" },
+            ],
          },
          {
-            icon: <GamepadIcon/>,
-            label: t("menu.games"),
-            link: "/student/gamified-learning",
-         },
-         {
-            icon: <Calendar />,
-            label: t("menu.timetable"),
-            link: "/student/timetable",
-         },
-         {
-            icon: <MessageCircleCode />,
-            label: t("menu.chat"),
-            link: "/student/chat",
-         },
-      ],
-      parent: [
-         { icon: <House />, label: t("menu.dashboard"), link: "/parent" },
-         { icon: <User />, label: t("menu.profile"), link: "/parent/profile" },
-         { icon: <User2 />, label: t("menu.myChild"), link: "/parent/child" },
-         {
-            icon: <ChartArea />,
-            label: t("menu.performance"),
-            link: "/parent/performance",
-         },
-         {
-            icon: <MessageCircleCode />,
-            label: t("menu.messages"),
-            link: "/parent/messages",
+            heading: "Account",
+            items: [
+               { icon: <User />, label: "Profile", link: "/student/profile" },
+               { icon: <Settings />, label: "Settings", link: "/student/settings" },
+               { icon: <HelpCircle />, label: "Help", link: "/student/help" },
+            ],
          },
       ],
-      teacher: [
-         { icon: <House />, label: t("menu.dashboard"), link: "/teacher" },
-         { icon: <User />, label: t("menu.profile"), link: "/teacher/profile" },
+      []
+   );
+
+   const parentNav = useMemo(
+      () => [
          {
-            icon: <Briefcase />,
-            label: t("menu.courses"),
-            link: "/teacher/courses",
+            heading: "Overview",
+            items: [
+               { icon: <House />, label: "Dashboard", link: "/parent" },
+               { icon: <Users />, label: "Children", link: "/parent/child" },
+               { icon: <BarChart3 />, label: "Performance", link: "/parent/performance" },
+            ],
          },
          {
-            icon: <NotebookText />,
-            label: t("menu.assignments"),
-            link: "/teacher/assignments",
+            heading: "Communication",
+            items: [
+               { icon: <MessageSquare />, label: "Messages", link: "/parent/messages" },
+               { icon: <Bell />, label: "Announcements", link: "/parent/announcements" },
+            ],
          },
          {
-            icon: <Users />,
-            label: t("menu.students"),
-            link: "/teacher/students",
-         },
-         {
-            icon: <MessageCircleCode />,
-            label: t("menu.chat"),
-            link: "/teacher/chat",
-         },
-         {
-            icon: <Calendar />,
-            label: t("menu.schedule"),
-            link: "/teacher/schedule",
+            heading: "Account",
+            items: [
+               { icon: <User />, label: "Profile", link: "/parent/profile" },
+               { icon: <Settings />, label: "Settings", link: "/parent/settings" },
+               { icon: <HelpCircle />, label: "Help", link: "/parent/help" },
+            ],
          },
       ],
-   };
+      []
+   );
+
+   const renderNav = (nav: typeof teacherNav) => (
+      <div className="space-y-8">
+         {nav.map((section) => (
+            <div key={section.heading} className="space-y-2">
+               <p className="text-xs uppercase tracking-wide text-slate-400 px-2">
+                  {section.heading}
+               </p>
+               <div className="flex flex-col gap-1">
+                  {section.items.map(({ icon, label, link }) => (
+                  <Link
+                     key={label}
+                        href={link}
+                        className={`flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all ${
+                        isActiveLink(link)
+                              ? "bg-blue-50 text-blue-700 border-l-4 border-blue-500"
+                              : "text-slate-600 hover:bg-slate-50"
+                     }`}
+                  >
+                        <span className="text-slate-500">{icon}</span>
+                        <span>{label}</span>
+                  </Link>
+               ))}
+               </div>
+            </div>
+         ))}
+      </div>
+   );
+
+   const navToRender =
+      role === "teacher"
+         ? teacherNav
+         : role === "student"
+         ? studentNav
+         : role === "parent"
+         ? parentNav
+         : null;
+
+   const roleLabel =
+      role === "teacher"
+         ? "Teacher Dashboard"
+         : role === "student"
+         ? "Student Dashboard"
+         : "Dashboard";
 
    return (
-      <div
-         className={`hidden sticky top-0 rounded-lg p-3 border border-submain shadow-lg bg-white md:flex flex-col justify-between gap-6 ${
-            isCollapsed ? "w-fit" : "w-[240px]"
-         } h-auto min-h-[400px] max-h-[90vh] overflow-y-auto`}
-      >
-         {/* Toggle Button */}
-         <button
-            onClick={toggleSidebar}
-            className="absolute -right-2 top-3 font-bold bg-white w-8 h-8 rounded-full border border-main hover:bg-background shadow-sm"
-         >
-            {isCollapsed ? ">" : "<"}
-         </button>
-
-         <Link
-            className="flex gap-3 items-center justify-start"
-            href="/"
-         >
-            <Image
-               src={logo}
-               alt="smarteduhub"
-               width={30}
-               height={30}
-            />
-            {!isCollapsed && (
-               <span className="text-main font-bold">Smart Eduhub</span>
-            )}
-         </Link>
-
-         <div className="flex flex-col gap-4">
-            {links[role].map(({ icon, label, link }) => (
-               <Link
-                  key={label}
-                  className={`flex gap-4 p-2 rounded-lg cursor-pointer hover:bg-background hover:text-main ${
-                     isActiveLink(link) ? "bg-background text-main font-medium" : ""
-                  }`}
-                  href={link}
-               >
-                  {icon}
-                  {!isCollapsed && <span>{label}</span>}
-               </Link>
-            ))}
+      <aside className="hidden md:flex w-[260px] flex-shrink-0 flex-col min-h-screen border-r border-slate-200 bg-white px-4 py-6 shadow-sm">
+         <div className="flex items-center gap-3 mb-8 px-1">
+            <Image src={logo} alt="smarteduhub" width={32} height={32} />
+            <div className="flex flex-col">
+               <span className="text-base font-semibold text-slate-900">
+                  Smart EduHub
+               </span>
+               <span className="text-xs text-slate-500">{roleLabel}</span>
+            </div>
          </div>
 
-         <div>
-            <div className="py-4 flex items-center gap-2">
-               <div className="border h-8 w-8 rounded-full flex items-center justify-center p-1">
-                  <User />
+         {navToRender ? (
+            renderNav(navToRender)
+         ) : (
+            <div className="space-y-2 text-sm text-slate-500">
+               <p>Sidebar not configured for this role.</p>
+            </div>
+         )}
+
+         <div className="mt-auto pt-8 space-y-4">
+            <div className="h-px bg-slate-200" />
+            <div className="flex items-center gap-3 px-1">
+               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-700">
+                  <User className="h-5 w-5" />
                </div>
-               {!isCollapsed && (
-                  <div className="flex flex-col">
-                     <small>{user?.name}</small>
-                     <small>{user?.email}</small>
+                  <div className="text-xs">
+                  <p className="font-semibold text-slate-900 line-clamp-1">
+                     {user?.name || "Teacher"}
+                  </p>
+                  <p className="text-slate-500 line-clamp-1">
+                     {user?.email || "teacher@school.edu"}
+                  </p>
                   </div>
-               )}
             </div>
             <button
-               className="flex gap-4 p-2 rounded-lg cursor-pointer hover:bg-main hover:text-white w-full"
+               className="flex w-full items-center justify-between rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition"
                onClick={handleLogout}
             >
-               <LogOut />
-               {!isCollapsed && <span>{t("logout")}</span>}
+               <div className="flex items-center gap-2">
+               <LogOut className="h-4 w-4" />
+                  <span>Log out</span>
+               </div>
+               <span className="text-xs text-slate-400">↩</span>
             </button>
          </div>
-      </div>
+      </aside>
    );
 };
 

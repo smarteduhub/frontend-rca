@@ -180,19 +180,17 @@ const DashboardNavbar = ({ title }: DashboardNavbarProps) => {
    ];
 
    const handleLanguageChange = (newLocale: string) => {
-      router.replace("/" + pathname, { locale: newLocale });
+      router.replace(pathname, { locale: newLocale });
    };
 
    return (
       <nav
-         className={`w-full sticky top-0 z-50 transition-all duration-300 ${
-            isScrolled
-               ? "bg-background/95 backdrop-blur-md shadow-sm"
-               : "bg-background/50 backdrop-blur-sm"
+         className={`sticky top-0 z-40 border-b border-neutral-200/60 bg-white/90 backdrop-blur-xl transition-all duration-300 ${
+            isScrolled ? "shadow-sm" : ""
          }`}
       >
-         <div className="mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
+         <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-1 items-center justify-between gap-4">
                {/* Left section */}
                <div className="flex items-center">
                   <h1 className="font-semibold text-xl tracking-tight">
@@ -201,7 +199,7 @@ const DashboardNavbar = ({ title }: DashboardNavbarProps) => {
                </div>
 
                {/* Center section - Search (hidden on mobile) */}
-               <div className="hidden md:flex flex-1 justify-center px-8">
+               <div className="hidden flex-1 justify-center px-4 md:flex">
                   <div className="relative w-full max-w-md">
                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <Search className="h-4 w-4 text-muted-foreground" />
@@ -209,13 +207,13 @@ const DashboardNavbar = ({ title }: DashboardNavbarProps) => {
                      <Input
                         type="search"
                         placeholder="Search..."
-                        className="w-full pl-10 h-9 bg-white"
+                        className="h-10 w-full rounded-full border border-neutral-200/60 bg-neutral-50 pl-10 text-sm shadow-inner focus:border-main focus:ring-2 focus:ring-main/10"
                      />
                   </div>
                </div>
 
                {/* Right section */}
-               <div className="hidden md:flex items-center gap-2">
+               <div className="hidden items-center gap-2 md:flex">
                   <Select
                      value={locale}
                      onValueChange={handleLanguageChange}

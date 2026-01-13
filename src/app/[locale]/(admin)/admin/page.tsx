@@ -1,283 +1,193 @@
 "use client";
+
 import DashboardNavbar from "@/components/DashboardNavbar";
-import { Brain, Rocket, Upload, ChevronRight, Users, BookOpen, Calculator, Award } from "lucide-react";
 import React from "react";
 import Link from "next/link";
-import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
-import "react-circular-progressbar/dist/styles.css";
-import AdminOveralChart from "@/components/AdminOveralChart";
-import { Calendar } from "@/components/ui/calendar";
-import TopStudentsTable from "@/components/TopStudentsTable";
+import { Users, BookOpen, Calendar, ClipboardList, Bell } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
-import { Badge } from "@/components/ui/badge";
+import { useFetchUsers } from "@/hooks/useUsers";
+
+const StatCard = ({
+   title,
+   value,
+   helper,
+}: {
+   title: string;
+   value: string;
+   helper?: string;
+}) => (
+   <div className="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
+      <p className="text-sm text-slate-600">{title}</p>
+      <p className="text-2xl font-semibold text-slate-900 mt-1">{value}</p>
+      {helper && <p className="text-xs text-slate-500 mt-1">{helper}</p>}
+   </div>
+);
 
 const AdminPage = () => {
-   const [date, setDate] = React.useState<Date | undefined>(new Date());
    const { user } = useAuthStore();
+   const { data: users } = useFetchUsers();
+
+   const totalUsers = users?.length ?? 0;
+   const activeUsers = users?.filter((u) => u.is_active)?.length ?? 0;
+   const inactiveUsers = totalUsers - activeUsers;
+
+   const activity = [
+      { title: "New teacher registered", time: "5m ago" },
+      { title: "3 students activated", time: "12m ago" },
+      { title: "Assignment posted (Math)", time: "30m ago" },
+      { title: "Parent account created", time: "1h ago" },
+   ];
+
+   const upcoming = [
+      { title: "Parent-Teacher Meeting", when: "Tomorrow • 5:00 PM" },
+      { title: "Physics Lab Prep", when: "Thu • 10:00 AM" },
+      { title: "Midterm schedule", when: "Fri • 9:00 AM" },
+   ];
 
    return (
-      <div className="bg-gray-50 min-h-screen">
+      <div className="bg-slate-50 min-h-screen">
          <DashboardNavbar title="Admin Dashboard" />
-         
-         {/* Header Section */}
-         <div className="bg-gradient-to-r from-blue-500 to-indigo-600 py-8">
-            <div className="container mx-auto px-4">
-               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+
+         <div className="container mx-auto px-4 py-6 space-y-6">
+            {/* Header */}
+            <div className="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
+               <div className="flex flex-col md:flex-row justify-between gap-2 md:items-center">
                   <div>
-                     <h1 className="text-2xl md:text-3xl font-bold text-white">
-                        Welcome, <span className="text-blue-100">{user?.name}</span>
+                     <h1 className="text-2xl font-semibold text-slate-900">
+                        Welcome, {user?.name || "Admin"}
                      </h1>
-                     <p className="text-blue-100 mt-1">Pleased that you are back</p>
+                     <p className="text-slate-600 text-sm">
+                        Central hub to manage users, courses, and events.
+                     </p>
                   </div>
-                  <div className="flex flex-col sm:flex-row gap-3">
-                     <button className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all">
-                        <Upload size={16} />
-                        <span>Upload Curriculum</span>
-                     </button>
-                     <button className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all">
-                        <Brain size={16} />
-                        <span>Analyze Curriculum</span>
-                     </button>
-                  </div>
-               </div>
-            </div>
-         </div>
-
-         <div className="container mx-auto px-4 py-8">
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 -mt-12 mb-8">
-               <div className="bg-white rounded-xl overflow-hidden shadow-md border-l-4 border-blue-500 hover:shadow-lg transition-all duration-300">
-                  <div className="p-6">
-                     <div className="flex justify-between items-start">
-                        <div>
-                           <h3 className="text-lg font-semibold text-gray-800">Overall Performance</h3>
-                           <div className="flex items-center gap-2 mt-2">
-                              <Rocket className="text-blue-500" size={20} />
-                              <span className="text-green-500 font-bold">8.7%</span>
-                              <span className="text-gray-600">improvement</span>
-                           </div>
-                           <p className="text-gray-500 mt-2 text-sm">All the corners of the school</p>
-                        </div>
-                        <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200">View</Badge>
-                     </div>
-                  </div>
-               </div>
-
-               <div className="bg-white rounded-xl overflow-hidden shadow-md border-l-4 border-indigo-500 hover:shadow-lg transition-all duration-300">
-                  <div className="p-6">
-                     <div className="flex justify-between items-start">
-                        <div>
-                           <h3 className="text-lg font-semibold text-gray-800">Total Revenue</h3>
-                           <div className="flex items-center gap-2 mt-2">
-                              <Calculator className="text-indigo-500" size={20} />
-                              <span className="text-green-500 font-bold">$24,500</span>
-                              <span className="text-gray-600">this month</span>
-                           </div>
-                           <p className="text-gray-500 mt-2 text-sm">12.5% increase from last month</p>
-                        </div>
-                        <Badge className="bg-indigo-100 text-indigo-700 hover:bg-indigo-200">View</Badge>
-                     </div>
-                  </div>
-               </div>
-
-               <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300">
-                  <div className="p-6">
-                     <div className="flex justify-between">
-                        <div>
-                           <h3 className="text-lg font-semibold text-gray-800">Students</h3>
-                           <div className="flex items-center gap-2 mt-2">
-                              <Users className="text-blue-500" size={20} />
-                              <span className="text-gray-800 font-bold">2.6k</span>
-                           </div>
-                           <p className="text-green-500 text-sm mt-1">80% increase</p>
-                        </div>
-                        <div className="flex flex-col items-end">
-                           <Link href="/admin/students" className="text-blue-500 hover:text-blue-700 text-sm flex items-center mb-2">
-                              View All <ChevronRight size={16} />
-                           </Link>
-                           <div style={{ width: 60, height: 60 }}>
-                              <CircularProgressbar
-                                 value={80}
-                                 text={`80%`}
-                                 styles={buildStyles({
-                                    textColor: "#1e40af",
-                                    textSize: "24px",
-                                    pathColor: "#3b82f6",
-                                    trailColor: "#dbeafe",
-                                 })}
-                              />
-                           </div>
-                        </div>
-                     </div>
-                  </div>
-               </div>
-
-               <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300">
-                  <div className="p-6">
-                     <div className="flex justify-between">
-                        <div>
-                           <h3 className="text-lg font-semibold text-gray-800">Lessons</h3>
-                           <div className="flex items-center gap-2 mt-2">
-                              <BookOpen className="text-indigo-500" size={20} />
-                              <span className="text-gray-800 font-bold">40</span>
-                           </div>
-                           <p className="text-green-500 text-sm mt-1">90% increase</p>
-                        </div>
-                        <div className="flex flex-col items-end">
-                           <Link href="/admin/courses" className="text-blue-500 hover:text-blue-700 text-sm flex items-center mb-2">
-                              View All <ChevronRight size={16} />
-                           </Link>
-                           <div style={{ width: 60, height: 60 }}>
-                              <CircularProgressbar
-                                 value={90}
-                                 text={`90%`}
-                                 styles={buildStyles({
-                                    textColor: "#4f46e5",
-                                    textSize: "24px",
-                                    pathColor: "#6366f1",
-                                    trailColor: "#e0e7ff",
-                                 })}
-                              />
-                           </div>
-                        </div>
-                     </div>
+                  <div className="flex flex-wrap gap-2">
+                     <Link href="/admin/users">
+                        <button className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm">
+                           Manage users
+                        </button>
+                     </Link>
+                     <Link href="/admin/courses">
+                        <button className="bg-white border px-4 py-2 rounded-md text-sm">
+                           Courses & assignments
+                        </button>
+                     </Link>
+                     <Link href="/admin/schedule">
+                        <button className="bg-white border px-4 py-2 rounded-md text-sm">
+                           Events / schedule
+                        </button>
+                     </Link>
                   </div>
                </div>
             </div>
 
-            {/* AI Score and Books Used */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-               <div className="lg:col-span-2 bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300">
-                  <div className="p-6">
-                     <h3 className="text-lg font-semibold text-gray-800 mb-4">AI Analytics</h3>
-                     <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
-                           <div className="flex justify-between items-center">
-                              <div>
-                                 <p className="text-gray-600">AI Score</p>
-                                 <h4 className="text-2xl font-bold text-gray-800 mt-1">20</h4>
-                                 <p className="text-green-500 text-sm mt-1">80% increase</p>
-                              </div>
-                              <div style={{ width: 50, height: 50 }}>
-                                 <CircularProgressbar
-                                    value={80}
-                                    text={`80%`}
-                                    styles={buildStyles({
-                                       textColor: "#1e40af",
-                                       textSize: "24px",
-                                       pathColor: "#3b82f6",
-                                       trailColor: "#dbeafe",
-                                    })}
-                                 />
-                              </div>
-                           </div>
-                        </div>
-                        <div className="bg-indigo-50 rounded-lg p-4 border border-indigo-100">
-                           <div className="flex justify-between items-center">
-                              <div>
-                                 <p className="text-gray-600">Books Used</p>
-                                 <h4 className="text-2xl font-bold text-gray-800 mt-1">23.6k</h4>
-                                 <p className="text-amber-500 text-sm mt-1">20% Available</p>
-                              </div>
-                              <div style={{ width: 50, height: 50 }}>
-                                 <CircularProgressbar
-                                    value={20}
-                                    text={`20%`}
-                                    styles={buildStyles({
-                                       textColor: "#7c3aed",
-                                       textSize: "24px",
-                                       pathColor: "#8b5cf6",
-                                       trailColor: "#ede9fe",
-                                    })}
-                                 />
-                              </div>
-                           </div>
-                        </div>
-                     </div>
-                  </div>
-               </div>
-
-               <div className="lg:col-span-2 bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300">
-                  <div className="p-6">
-                     <h3 className="text-lg font-semibold text-gray-800 mb-4">Calendar</h3>
-                     <Calendar
-                        mode="single"
-                        selected={date}
-                        onSelect={setDate}
-                        className="rounded-md w-full"
-                     />
-                  </div>
-               </div>
+            {/* Quick stats */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+               <StatCard title="Total users" value={String(totalUsers)} helper="All roles" />
+               <StatCard title="Active users" value={String(activeUsers)} helper="Activated" />
+               <StatCard title="Inactive users" value={String(inactiveUsers)} helper="Awaiting activation" />
+               <StatCard title="Active users today" value="—" helper="Logged in today" />
+               <StatCard title="Ongoing courses" value="—" helper="Active courses" />
+               <StatCard title="Upcoming events" value="—" helper="This week" />
             </div>
 
-            {/* Chart Section */}
-            <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 mb-8">
-               <div className="p-6">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Performance Overview</h3>
-                  <AdminOveralChart />
-               </div>
-            </div>
-
-            {/* Bottom Section */}
-            <div className="flex flex-col lg:flex-row gap-8">
-               {/* Top Performing Students */}
-               <div className="w-full lg:w-2/3 bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300">
-                  <div className="p-6">
-                     <div className="flex justify-between items-center mb-6">
-                        <h3 className="text-lg font-semibold text-gray-800">Top Performing Students</h3>
-                        <Link href="/admin/students" className="text-blue-500 hover:text-blue-700 text-sm flex items-center">
-                           View All <ChevronRight size={16} />
+            {/* Main panels */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+               {/* Users */}
+               <div className="bg-white border border-slate-200 rounded-lg p-4 shadow-sm space-y-3 lg:col-span-2">
+                  <div className="flex items-center justify-between">
+                     <h2 className="text-lg font-semibold text-slate-900">
+                        Users
+                     </h2>
+                     <div className="flex gap-2">
+                        <Link href="/admin/users">
+                           <button className="text-sm text-blue-600">View all</button>
+                        </Link>
+                        <Link href="/admin/users">
+                           <button className="text-sm text-slate-700">Add user</button>
                         </Link>
                      </div>
-                     <TopStudentsTable />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                     <div className="flex items-center gap-2 text-slate-700">
+                        <Users className="h-4 w-4 text-blue-600" />
+                        <span>Students</span>
+                     </div>
+                     <div className="flex items-center gap-2 text-slate-700">
+                        <Users className="h-4 w-4 text-emerald-600" />
+                        <span>Teachers</span>
+                     </div>
+                     <div className="flex items-center gap-2 text-slate-700">
+                        <Users className="h-4 w-4 text-amber-600" />
+                        <span>Parents</span>
+                     </div>
+                  </div>
+                  <p className="text-sm text-slate-600">
+                     Activate, deactivate, or edit accounts from the Users page.
+                  </p>
+               </div>
+
+               {/* Activity feed */}
+               <div className="bg-white border border-slate-200 rounded-lg p-4 shadow-sm space-y-3">
+                  <div className="flex items-center justify-between">
+                     <h2 className="text-lg font-semibold text-slate-900">
+                        Activity
+                     </h2>
+                     <Bell className="h-4 w-4 text-slate-500" />
+                  </div>
+                  <div className="space-y-2">
+                     {activity.map((item) => (
+                        <div
+                           key={item.title}
+                           className="border border-slate-100 rounded-md px-3 py-2"
+                        >
+                           <p className="text-sm text-slate-900">{item.title}</p>
+                           <p className="text-xs text-slate-500">{item.time}</p>
+                        </div>
+                     ))}
+                  </div>
+               </div>
+            </div>
+
+            {/* Courses & Assignments, Events */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+               <div className="bg-white border border-slate-200 rounded-lg p-4 shadow-sm space-y-3">
+                  <div className="flex items-center justify-between">
+                     <h2 className="text-lg font-semibold text-slate-900">
+                        Courses & assignments
+                     </h2>
+                     <Link href="/admin/courses" className="text-sm text-blue-600">
+                        Open
+                     </Link>
+                  </div>
+                  <div className="flex items-center gap-2 text-slate-700">
+                     <BookOpen className="h-4 w-4 text-indigo-600" />
+                     <span>View all courses, assign teachers, check enrollments.</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-slate-700">
+                     <ClipboardList className="h-4 w-4 text-purple-600" />
+                     <span>Review assignments posted by teachers.</span>
                   </div>
                </div>
 
-               {/* More Info */}
-               <div className="w-full lg:w-1/3">
-                  <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 p-6">
-                     <h3 className="text-lg font-semibold text-gray-800 mb-4">Quick Stats</h3>
-                     <div className="grid grid-cols-1 gap-4">
-                        <div className="bg-blue-50 rounded-lg p-4 border border-blue-100 flex items-center gap-4">
-                           <div className="bg-blue-100 p-3 rounded-full">
-                              <Users className="h-6 w-6 text-blue-500" />
-                           </div>
-                           <div>
-                              <p className="text-2xl font-bold text-gray-800">300</p>
-                              <p className="text-gray-600 text-sm">More Students this year</p>
-                           </div>
+               <div className="bg-white border border-slate-200 rounded-lg p-4 shadow-sm space-y-3">
+                  <div className="flex items-center justify-between">
+                     <h2 className="text-lg font-semibold text-slate-900">
+                        Events / schedule
+                     </h2>
+                     <Link href="/admin/schedule" className="text-sm text-blue-600">
+                        Open
+                     </Link>
+                  </div>
+                  <div className="space-y-2">
+                     {upcoming.map((item) => (
+                        <div
+                           key={item.title}
+                           className="border border-slate-100 rounded-md px-3 py-2"
+                        >
+                           <p className="text-sm text-slate-900">{item.title}</p>
+                           <p className="text-xs text-slate-500">{item.when}</p>
                         </div>
-                        
-                        <div className="bg-purple-50 rounded-lg p-4 border border-purple-100 flex items-center gap-4">
-                           <div className="bg-purple-100 p-3 rounded-full">
-                              <BookOpen className="h-6 w-6 text-purple-500" />
-                           </div>
-                           <div>
-                              <p className="text-2xl font-bold text-gray-800">6</p>
-                              <p className="text-gray-600 text-sm">Courses Completed</p>
-                           </div>
-                        </div>
-                        
-                        <div className="bg-amber-50 rounded-lg p-4 border border-amber-100 flex items-center gap-4">
-                           <div className="bg-amber-100 p-3 rounded-full">
-                              <Award className="h-6 w-6 text-amber-500" />
-                           </div>
-                           <div>
-                              <p className="text-2xl font-bold text-gray-800">25</p>
-                              <p className="text-gray-600 text-sm">Competitions Won</p>
-                           </div>
-                        </div>
-                        
-                        <div className="bg-green-50 rounded-lg p-4 border border-green-100 flex items-center gap-4">
-                           <div className="bg-green-100 p-3 rounded-full">
-                              <Award className="h-6 w-6 text-green-500" />
-                           </div>
-                           <div>
-                              <p className="text-2xl font-bold text-gray-800">25</p>
-                              <p className="text-gray-600 text-sm">Competitions Won</p>
-                           </div>
-                        </div>
-                     </div>
+                     ))}
                   </div>
                </div>
             </div>

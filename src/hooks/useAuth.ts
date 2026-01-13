@@ -1,37 +1,36 @@
+/**
+ * Auth Hooks - React Query hooks for authentication
+ * 
+ * Key hooks:
+ * - useLoginUser(): Login mutation, updates auth store on success
+ * - useRegisterUser(): Registration mutation
+ * - useLogoutUser(): Logout mutation, clears auth store
+ * - useProfile(): Fetch current user profile
+ * 
+ * All hooks update useAuthStore (Zustand) on success.
+ * Token is stored in cookies by authService.
+ */
+
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { authorizedAPI, unauthorizedAPI } from "@/lib/api";
-import handleApiRequest from "@/utils/handleApiRequest";
 import { useAuthStore } from "@/store/useAuthStore";
-import { UserUpdate } from "@/types/user";
+import { UserUpdate, User } from "@/types/user";
+import { authService } from "@/services";
+import type { AuthResponse } from "@/services/auth.service";
+import axios from "axios";
 import { Cookies } from "react-cookie";
+import { toast } from "react-toastify";
 
-interface User {
-   id: string;
-   username?: string;
-   name: string;
-   email: string;
-   phone?: string;
-   country?: string;
-   field_of_study?: string;
-   role: string;
-   is_active: boolean;
-   is_superuser: boolean;
-   created_at: string;
-   oauth_provider?: string;
-}
+const cookies = new Cookies();
 
-interface UpdateUserData {
-   userId: string;
-   formData: Partial<User>;
-}
-
-interface LoginData {
-   email: string;
+// Support both email and studentId for backward compatibility
+export interface LoginData {
+   email?: string;
+   studentId?: string; // Legacy field name support
    password: string;
 }
 
-interface SignupData {
+export interface SignupData {
    name: string;
    email: string;
    password: string;
@@ -43,104 +42,90 @@ interface SignupData {
    field_of_study?: string;
 }
 
-// Add these interfaces
-interface OAuthResponse {
-   auth_url: string;
-}
-
-interface OAuthCallbackResponse {
-   access_token: string;
-   token_type: string;
-   expires_in: number;
-   user: User;
-}
-
-// API call functions
-const loginUser = (userData: LoginData) => {
-   return handleApiRequest(() =>
-      unauthorizedAPI.post("/auth/login", userData, { withCredentials: true })
-   );
+// API call functions using services
+const loginUser = (userData: LoginData): Promise<AuthResponse> => {
+   // Support both email and studentId for backward compatibility
+   const email = userData.email || userData.studentId;
+   if (!email) throw new Error('Email or studentId is required');
+   return authService.login(email, userData.password);
 };
 
-const registerUser = (userData: SignupData) => {
-   return handleApiRequest(() =>
-      unauthorizedAPI.post("/auth/signup", userData, { withCredentials: true })
-   );
+const registerUser = (userData: SignupData): Promise<AuthResponse> => {
+   return authService.register(userData);
 };
 
-const logoutUser = async () => {
-   try {
-      await authorizedAPI.post("/auth/logout", {}, { withCredentials: true });
-      // Clear cookies manually as fallback
-      document.cookie =
-         "access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-      // Clear local storage
-      localStorage.removeItem("auth-storage");
-      return true;
-   } catch (error) {
-      console.error("Logout error:", error);
-      throw error;
-   }
+const logoutUser = async (): Promise<void> => {
+   return authService.logout();
 };
 
 const initiateOAuth = (provider: string, role?: string) => {
-   // For login (no role), just use provider in state
-   // For register (with role), include role in state
-   const stateString = role
-      ? `${provider}-${role}-${Math.random().toString(36).substring(7)}`
-      : `${provider}-${Math.random().toString(36).substring(7)}`;
-
-   return handleApiRequest(() =>
-      unauthorizedAPI.get<OAuthResponse>(
-         `/auth/oauth/${provider}?state=${stateString}${
-            role ? `&role=${role}` : ""
-         }`
-      )
-   );
+   return authService.initiateOAuth(provider, role);
 };
 
-const handleOAuthCallback = (provider: string, code: string) => {
-   return handleApiRequest(() =>
-      unauthorizedAPI.get<OAuthCallbackResponse>(
-         `/auth/oauth/${provider}/callback`,
-         {
-            params: { code },
-            withCredentials: true,
-         }
-      )
-   );
+const handleOAuthCallback = (provider: string, code: string): Promise<AuthResponse> => {
+   return authService.handleOAuthCallback(provider, code);
 };
 
-const updateUserProfile = async (userData: UserUpdate) => {
+const updateUserProfile = async (userData: UserUpdate): Promise<User> => {
    const userId = useAuthStore.getState().user?.id;
    if (!userId) throw new Error("User ID not found");
-
-   return handleApiRequest(() =>
-      authorizedAPI.put(`/users/${userId}`, userData, { withCredentials: true })
-   );
+   return authService.updateUserProfile(userId, userData);
 };
 
-const fetchUserProfile = async () => {
-   return handleApiRequest(() =>
-      authorizedAPI.get("/users/profile", {
-         withCredentials: true,
-      })
-   );
+const fetchUserProfile = async (): Promise<User> => {
+   return authService.getProfile();
 };
 
 export const useLoginUser = () => {
    const { setUser, setIsAuthenticated } = useAuthStore();
+   const router = useRouter();
 
-   return useMutation({
+   return useMutation<AuthResponse, Error, LoginData>({
       mutationFn: loginUser,
-      onSuccess: (data) => {
-         if (data && data.user) {
-            setUser(data.user);
-            setIsAuthenticated(true);
+      onSuccess: async (data) => {
+         if (data?.access_token) {
+            // Store token in cookie for axios interceptor
+            cookies.set("access_token", data.access_token, { path: "/" });
+            try {
+               // Fetch profile to populate store with role/user data
+               const profile = await authService.getProfile();
+               setUser(profile as User);
+               setIsAuthenticated(true);
+               // Redirect by role
+               const role = (profile as any)?.role;
+               switch (role) {
+                  case "admin":
+                     router.replace("/admin");
+                     break;
+                  case "teacher":
+                     router.replace("/teacher");
+                     break;
+                  case "parent":
+                     router.replace("/parent");
+                     break;
+                  case "student":
+                  default:
+                     router.replace("/student");
+                     break;
+               }
+            } catch (err) {
+               console.error("Profile fetch after login failed:", err);
+            }
          }
       },
       onError: (error) => {
-         console.error("Login error:", error);
+         // Log error details for debugging
+         if (axios.isAxiosError(error)) {
+            console.error("Login error:", error.response?.status, error.response?.data);
+            if (
+               error.response?.status === 401 ||
+               error.response?.status === 403
+            ) {
+               toast.error("Please activate your account and log in.");
+            }
+         } else {
+            console.error("Login error:", error);
+         }
       },
    });
 };
@@ -148,16 +133,22 @@ export const useLoginUser = () => {
 export const useRegisterUser = () => {
    const { setUser, setIsAuthenticated } = useAuthStore();
 
-   return useMutation({
+   return useMutation<AuthResponse, Error, SignupData>({
       mutationFn: registerUser,
       onSuccess: (data) => {
-         if (data && data.user) {
-            setUser(data.user); // Update Zustand store with user data
+         // Ensure we have valid user data and token before setting state
+         if (data?.user && data?.access_token) {
+            setUser(data.user);
             setIsAuthenticated(true);
          }
       },
       onError: (error) => {
-         console.error("Signup error:", error);
+         // Log error details for debugging
+         if (axios.isAxiosError(error)) {
+            console.error("Signup error:", error.response?.status, error.response?.data);
+         } else {
+            console.error("Signup error:", error);
+         }
       },
    });
 };
@@ -167,31 +158,40 @@ export const useLogoutUser = () => {
    const router = useRouter();
    const queryClient = useQueryClient();
 
-   return useMutation({
+   return useMutation<void, Error, void>({
       mutationFn: logoutUser,
       onSuccess: () => {
          clearUser(); // Clear user data from Zustand store
          // Clear React Query cache
          queryClient.clear();
+         cookies.remove("access_token", { path: "/" });
          // Redirect to login
-         location.replace("/login");
+         if (typeof window !== 'undefined') {
+            location.replace("/login");
+         }
       },
       onError: (error) => {
          console.error("Logout error:", error);
          // Even if the API call fails, clear local data
          clearUser();
-         localStorage.removeItem("auth-storage");
-         location.replace("/login");
+         if (typeof window !== 'undefined') {
+            localStorage.removeItem("auth-storage");
+            cookies.remove("access_token", { path: "/" });
+            location.replace("/login");
+         }
       },
    });
 };
 
 export const useInitiateOAuth = () => {
-   return useMutation({
-      mutationFn: ({ provider, role }: { provider: string; role?: string }) =>
-         initiateOAuth(provider, role),
+   return useMutation<
+      { auth_url: string },
+      Error,
+      { provider: string; role?: string }
+   >({
+      mutationFn: ({ provider, role }) => initiateOAuth(provider, role),
       onSuccess: (data) => {
-         if (data?.auth_url) {
+         if (data?.auth_url && typeof window !== 'undefined') {
             window.location.href = data.auth_url;
          }
       },
@@ -206,47 +206,56 @@ export const useOAuthCallback = () => {
    const queryClient = useQueryClient();
    const router = useRouter();
 
-   return useMutation({
-      mutationFn: async ({
-         provider,
-         code,
-         state,
-      }: {
-         provider: string;
-         code: string;
-         state: string;
-      }) => {
+   return useMutation<
+      AuthResponse,
+      Error,
+      { provider: string; code: string; state: string }
+   >({
+      mutationFn: async ({ provider, code }) => {
          try {
+            // Call OAuth callback API endpoint
             const response = await handleOAuthCallback(provider, code);
-            if (response?.user) {
+            
+            // Verify we have user data and token
+            if (response?.user && response?.access_token) {
+               // Update auth store with user data
                setUser(response.user);
                setIsAuthenticated(true);
 
-               // Get role from user data
+               // Get user role to determine redirect destination
                const role = response.user.role;
 
-               // Redirect based on role
-               switch (role) {
-                  case "admin":
-                     router.push("/admin");
-                     break;
-                  case "teacher":
-                     router.push("/teacher");
-                     break;
-                  case "parent":
-                     router.push("/parent");
-                     break;
-                  case "student":
-                     router.push("/student");
-                     break;
-                  default:
-                     router.push("/student");
+               // Redirect to role-specific dashboard
+               if (typeof window !== 'undefined') {
+                  switch (role) {
+                     case "admin":
+                        location.replace("/admin");
+                        break;
+                     case "teacher":
+                        location.replace("/teacher");
+                        break;
+                     case "parent":
+                        location.replace("/parent");
+                        break;
+                     case "student":
+                        location.replace("/student");
+                        break;
+                     default:
+                        location.replace("/student");
+                  }
                }
+            } else {
+               // OAuth response missing required data
+               throw new Error("Invalid OAuth response");
             }
+            
             return response;
          } catch (error) {
+            // OAuth callback failed - redirect to login
             console.error("OAuth callback error:", error);
-            location.replace("/login");
+            if (typeof window !== 'undefined') {
+               location.replace("/login");
+            }
             throw error;
          }
       },
@@ -257,11 +266,11 @@ export const useUpdateProfile = () => {
    const { setUser } = useAuthStore();
    const queryClient = useQueryClient();
 
-   return useMutation({
+   return useMutation<User, Error, UserUpdate>({
       mutationFn: updateUserProfile,
       onSuccess: (data) => {
-         if (data?.user) {
-            setUser(data.user);
+         if (data) {
+            setUser(data);
             queryClient.invalidateQueries({ queryKey: ["profile"] });
          }
       },
@@ -272,7 +281,7 @@ export const useUpdateProfile = () => {
 };
 
 export const useProfile = () => {
-   return useQuery({
+   return useQuery<User, Error>({
       queryKey: ["profile"],
       queryFn: fetchUserProfile,
       staleTime: 1000 * 60 * 5,

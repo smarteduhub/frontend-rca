@@ -7,6 +7,10 @@
     "loginButton": "Injira",
     "registerButton": "Iyandikishe",
     "registering": "Kwiyandikisha...",
+    "activate": "Activate Account",
+    "needActivation": "Have a school code or welcome email?",
+    "activateNow": "Activate your account",
+    "noSelfSignup": "Students do not self-register. Use the activation link from your school.",
     "fullName": "Amazina yombi",
     "email": "Imeyili",
     "password": "Ijambo ry'ibanga",
@@ -47,69 +51,68 @@
   },
   "home": {
     "hero": {
-      "badge": "Kwiga Gushingiye ku Bwenge Bwite",
-      "title": "Smart Eduhub: Ejo Hazaza h'Uburyo bwo Kwiga Bwihariye",
-      "description": "Hindura urugendo rwawe rwo kwiga n'urubuga rwacu rushingiye ku bwenge bwite buhinduka hakurikijwe imbaraga n'uburyo bwawe bwihariye. Kora ibishoboka byose ufite ibikoresho byihariye ku banyeshuri, ababyeyi, abarimu n'abayobozi.",
-      "searchPlaceholder": "Shakisha amasomo...",
-      "exploreButton": "Reba",
-      "students": "Abanyeshuri",
-      "teachers": "Abarimu",
-      "parents": "Ababyeyi"
+      "badge": "Built with schools and teachers",
+      "title": "Smart EduHub: Your school learning space",
+      "description": "A calm, trusted home for lessons, assignments, and updates so students, teachers, and parents always know what to do next.",
+      "searchPlaceholder": "Search your subjects or classes",
+      "exploreButton": "Find class",
+      "students": "Students",
+      "teachers": "Teachers",
+      "parents": "Parents",
+      "studentsDesc": "See today’s lessons, submit work, and track your progress.",
+      "teachersDesc": "Share resources, set assignments, and give quick feedback.",
+      "parentsDesc": "Check grades, attendance, and notes from teachers.",
+      "dailyPlan": "Daily plan",
+      "weeklyLessons": "5 lessons scheduled",
+      "reminders": "Reminders are on",
+      "remindersCopy": "Stay ahead of due dates and tests."
     },
     "features": {
-      "title": "Ibiranga Urubuga",
-      "subtitle": "Ikoranabuhanga Rihindura Kwiga",
-      "description": "Smart Eduhub ihuriza hamwe ubwenge bw'ikoranabuhanga n'uburyo bwo kwiga bwageragejwe kugira ngo habeho uburyo bwo kwiga bwihariye buhura n'ibyo buri munyeshuri akeneye.",
-      "aiLearning": {
-        "title": "Kwiga Gushingiye ku Bwenge Bwite",
-        "description": "Uburyo bw'imibare bushingiye ku buryo buri munyeshuri yiga kugira ngo habeho inyigisho zihariye zihinduka mu gihe nyacyo hakurikijwe uko agenda ateye imbere n'ibyo akeneye."
+      "title": "Built for your school community",
+      "subtitle": "One place where everyone knows what to do next",
+      "description": "Students, teachers, and parents share the same simple schedule, assignments, and messages.",
+      "studentHub": {
+        "title": "Students stay on track",
+        "description": "Check lessons, submit work, and see feedback in one calm space."
       },
-      "analytics": {
-        "title": "Isesengura Ryuzuye",
-        "description": "Imbonerahamwe zirambuye zitanga amakuru y'ingenzi ku mikorere, zigaragaza imbaraga n'ahantu hakeneye kwitabwaho byisumbuye."
+      "teacherTools": {
+        "title": "Teachers get time back",
+        "description": "Share resources, collect assignments, and track progress quickly."
       },
-      "multiRole": {
-        "title": "Urubuga rw'Inzego Nyinshi",
-        "description": "Uburyo bwihariye ku banyeshuri, ababyeyi, abarimu n'abayobozi bafite ibiranga byihariye byateguwe ku byo buri mukoresha akeneye."
+      "parentAccess": {
+        "title": "Parents stay informed",
+        "description": "See attendance, grades, and teacher notes without needing extra calls."
       },
-      "curriculum": {
-        "title": "Ihuzwa n'Integanyanyigisho",
-        "description": "Ibiri mu nyigisho bihuje n'amahame y'igihugu mu burezi byemeza ko abanyeshuri bahabwa inyigisho zuzuye zibategura ku bizamini n'ibindi."
-      },
-      "feedback": {
-        "title": "Isubizabitebereye",
-        "description": "Isuzuma n'ibisubizo mu gihe nyacyo mu bikorwa byo kwiga bifasha abanyeshuri gusobanukirwa vuba ibitekerezo aho gutegereza isuzuma risanzwe."
-      },
-      "scheduling": {
-        "title": "Guteganya Igihe Cyawe",
-        "description": "Iga igihe cyose, aho ari ho hose ushobora kubona amasomo, biha abanyeshuri uburyo bwo gutera imbere ku kigero cyabo bari kuri gahunda."
+      "safeSpace": {
+        "title": "Safe, school-managed access",
+        "description": "Accounts come from your school with clear permissions and sign-in rules."
       }
     },
     "benefits": {
-      "title": "Kuki Wahitamo Smart Eduhub",
-      "subtitle": "Guhindura Uburezi Binyuze mu Ikoranabuhanga",
-      "description": "Smart Eduhub ihuriza hamwe ikoranabuhanga ryihuta n'uburyo bwo kwigisha bwageragejwe kugira ngo itange uburyo bwo kwiga bwihariye bufasha abanyeshuri kugera ku ntego zabo ndetse igaha n'abarimu ibikoresho bikomeye byo kongera ubushobozi bwabo.",
+      "title": "Why schools choose Smart EduHub",
+      "subtitle": "Simple, supportive, ready for class",
+      "description": "Designed with teachers and students to keep lessons, assignments, and updates in one warm place.",
       "personalized": {
-        "title": "Kwiga ku Giti Cyawe",
-        "description": "Ikoranabuhanga ryacu rihinduka n'uburyo buri munyeshuri yiga, umuvuduko we n'ibyo akunda, bigatanga uburyo bwo kwiga bwihariye buteza imbere kwiga no kuger ku ntego."
+        "title": "Clear daily plan",
+        "description": "Students see what is due today, what is coming next, and how to prepare."
       },
       "analytics": {
-        "title": "Isuzuma ry'Imikorere",
-        "description": "Kubona amakuru yuzuye ku iterambere mu myigire hamwe n'imbonerahamwe z'isesengura zirambuye ku banyeshuri, ababyeyi, abarimu n'abayobozi kugira ngo bakurikirane iterambere mu gihe nyacyo."
+        "title": "Teachers teach, not chase",
+        "description": "Post lessons once, gather work easily, and spot who needs help."
       },
       "content": {
-        "title": "Ibiri mo Bishimisha",
-        "description": "Kubona amasomo y'amajwi n'amashusho, ibibazo, n'ibiganiro byateguwe n'impuguke mu burezi kugira ngo kwiga bibe bishimishije kandi bigere ku ntego nziza mu myigire."
+        "title": "Parents stay in the loop",
+        "description": "Quick views of attendance, grades, and messages keep families informed."
       },
       "improvement": {
-        "title": "Gukomeza Guteza Imbere",
-        "description": "Urubuga rwacu rutera imbere na buri munyeshuri, rukomeza gutunganya inama n'inzira zo kwiga bishingiye ku mikorere n'ubushakashatsi bushya mu burezi."
+        "title": "Safe and school-ready",
+        "description": "Secure accounts, clear roles, and simple language students can trust."
       }
     },
     "courses": {
       "title": "AMASOMO YATORANIJWE",
-      "subtitle": "Bumbura Urugendo Rugufi rwo Kwiga",
-      "description": "Reba amasomo yacu ashingiye ku bwenge bwite yateguwe kugira ngo ahure n'uburyo bwawe bwo kwiga kandi akugufashe kwiga ubumenyi bushya ku kigero cyawe.",
+      "subtitle": "Class resources picked for you",
+      "description": "Explore lessons and practice tasks prepared by your teachers and school partners.",
       "loading": "Amasomo arimo gutangira...",
       "error": "Hari ikibazo mu gutangiza amasomo. Nyamuneka ongera ugerageze nyuma.",
       "viewCourse": "Reba Isomo",
@@ -124,12 +127,11 @@
     }
   },
   "navbar": {
-    "courses": "Amasomo",
-    "about": "Turi Ba Nde",
-    "contact": "Twandikire",
+    "home": "Home",
+    "about": "About",
     "dashboard": "Ibiro",
     "login": "Injira",
-    "register": "Iyandikishe",
+    "activate": "Activate Account",
     "language": {
       "english": "EN",
       "french": "FR",
@@ -268,6 +270,7 @@
       "enrolledCourses": "Amasomo yanditsemo",
       "users": "Abakoresha",
       "assignments": "Imikoro",
+      "quizzes": "Ibizamini",
       "games":"Imikino",
       "chat": "Kuganira",
       "schedule": "Gahunda",

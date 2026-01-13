@@ -1,8 +1,8 @@
-//@ts-nocheck
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
-import { useGetEnrolledCourses } from "@/hooks/useCourses";
+import { useGetEnrolledCourses, calculateCourseProgress } from "@/hooks/useCourses";
+import type { Course } from "@/types/course";
 import {
    GraduationCap,
    Clock,
@@ -23,28 +23,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DashboardNavbar from "@/components/DashboardNavbar";
 import { EnrolledCourseCard } from "@/components/student/EnrolledCourseCard";
 
-interface CourseData {
-   id: string;
-   title: string;
-   description?: string;
-   category: string;
-   level: string;
-   progress?: number;
-   lastAccessed?: string;
-   teacher?: {
-      id: string;
-      name: string;
-   };
-}
-
-interface Course extends CourseData {
-   progress?: number;
-   lastAccessed?: string;
-   teacher?: {
-      id: string;
-      name: string;
-   };
-}
 
 const levelColorMap: Record<string, string> = {
    beginner: "bg-green-100 text-green-700 border-green-200",
@@ -63,14 +41,18 @@ const categoryIconMap: Record<string, React.ReactNode> = {
 
 const EnrolledCoursesPortal = () => {
    const {
-      data: courses,
+      data: courses = [],
       isLoading,
       error,
-   } = useGetEnrolledCourses<Course[]>();
+   } = useGetEnrolledCourses();
    const [searchTerm, setSearchTerm] = useState("");
    const [activeTab, setActiveTab] = useState("all");
 
-   const displayCourses = courses || [];
+   // Calculate progress for each course
+   const displayCourses = courses.map((course: Course) => ({
+      ...course,
+      progress: calculateCourseProgress(course),
+   }));
 
    // Filter courses based on search term
    const filteredCourses = displayCourses.filter(

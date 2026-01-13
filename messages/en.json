@@ -7,6 +7,10 @@
     "loginButton": "Login",
     "registerButton": "Register",
     "registering": "Registering...",
+    "activate": "Activate Account",
+    "needActivation": "Have a school code or welcome email?",
+    "activateNow": "Activate your account",
+    "noSelfSignup": "Students do not self-register. Use the activation link from your school.",
     "fullName": "Full Name",
     "email": "Email",
     "password": "Password",
@@ -47,69 +51,68 @@
   },
   "home": {
     "hero": {
-      "badge": "AI-Driven Education",
-      "title": "Smart Eduhub: The Future of Personalized Learning",
-      "description": "Revolutionize your learning journey with our AI-powered platform that adapts to your unique pace and style. Unlock your full potential with personalized content for students, parents, teachers, and administrators.",
-      "searchPlaceholder": "Search for courses...",
-      "exploreButton": "Explore",
+      "badge": "Built with schools and teachers",
+      "title": "Smart EduHub: Your school learning space",
+      "description": "A calm, trusted home for lessons, assignments, and updates so students, teachers, and parents always know what to do next.",
+      "searchPlaceholder": "Search your subjects or classes",
+      "exploreButton": "Find class",
       "students": "Students",
       "teachers": "Teachers",
-      "parents": "Parents"
+      "parents": "Parents",
+      "studentsDesc": "See today’s lessons, submit work, and track your progress.",
+      "teachersDesc": "Share resources, set assignments, and give quick feedback.",
+      "parentsDesc": "Check grades, attendance, and notes from teachers.",
+      "dailyPlan": "Daily plan",
+      "weeklyLessons": "5 lessons scheduled",
+      "reminders": "Reminders are on",
+      "remindersCopy": "Stay ahead of due dates and tests."
     },
     "features": {
-      "title": "Platform Features",
-      "subtitle": "Technology That Transforms Learning",
-      "description": "Smart Eduhub combines cutting-edge artificial intelligence with proven educational methodologies to create an adaptive learning environment that meets the unique needs of every student.",
-      "aiLearning": {
-        "title": "AI-Powered Learning",
-        "description": "Advanced algorithms analyze each student's learning patterns to deliver personalized content that adapts in real-time to their progress and needs."
+      "title": "Built for your school community",
+      "subtitle": "One place where everyone knows what to do next",
+      "description": "Students, teachers, and parents share the same simple schedule, assignments, and messages.",
+      "studentHub": {
+        "title": "Students stay on track",
+        "description": "Check lessons, submit work, and see feedback in one calm space."
       },
-      "analytics": {
-        "title": "Comprehensive Analytics",
-        "description": "Detailed dashboards provide actionable insights into performance, highlighting strengths and identifying areas that need additional attention."
+      "teacherTools": {
+        "title": "Teachers get time back",
+        "description": "Share resources, collect assignments, and track progress quickly."
       },
-      "multiRole": {
-        "title": "Multi-Role Platform",
-        "description": "Specialized interfaces for students, parents, teachers, and administrators with features designed specifically for each user's needs."
+      "parentAccess": {
+        "title": "Parents stay informed",
+        "description": "See attendance, grades, and teacher notes without needing extra calls."
       },
-      "curriculum": {
-        "title": "Curriculum Aligned",
-        "description": "Content mapped to national education standards ensuring students receive comprehensive instruction that prepares them for standardized testing and beyond."
-      },
-      "feedback": {
-        "title": "Instant Feedback",
-        "description": "Real-time assessment and feedback during learning activities help students understand concepts immediately rather than waiting for traditional grading."
-      },
-      "scheduling": {
-        "title": "Flexible Scheduling",
-        "description": "Learn anytime, anywhere with on-demand access to lessons, allowing students to progress at their own pace while maintaining accountability."
+      "safeSpace": {
+        "title": "Safe, school-managed access",
+        "description": "Accounts come from your school with clear permissions and sign-in rules."
       }
     },
     "benefits": {
-      "title": "Why Choose Smart Eduhub",
-      "subtitle": "Transforming Education Through Technology",
-      "description": "Smart Eduhub combines cutting-edge AI with proven educational methodologies to deliver personalized learning experiences that help students achieve their full potential while giving educators powerful tools to maximize their impact.",
+      "title": "Why schools choose Smart EduHub",
+      "subtitle": "Simple, supportive, ready for class",
+      "description": "Designed with teachers and students to keep lessons, assignments, and updates in one warm place.",
       "personalized": {
-        "title": "Personalized Learning",
-        "description": "Our AI technology adapts to each student's learning style, pace, and preferences, creating truly customized educational experiences that improve retention and results."
+        "title": "Clear daily plan",
+        "description": "Students see what is due today, what is coming next, and how to prepare."
       },
       "analytics": {
-        "title": "Performance Analytics",
-        "description": "Get comprehensive insights into academic progress with detailed analytics dashboards for students, parents, teachers, and administrators to track growth in real-time."
+        "title": "Teachers teach, not chase",
+        "description": "Post lessons once, gather work easily, and spot who needs help."
       },
       "content": {
-        "title": "Engaging Content",
-        "description": "Access interactive lessons, videos, quizzes, and simulations designed by educational experts to make learning enjoyable while achieving better academic outcomes."
+        "title": "Parents stay in the loop",
+        "description": "Quick views of attendance, grades, and messages keep families informed."
       },
       "improvement": {
-        "title": "Continuous Improvement",
-        "description": "Our platform evolves with each student, constantly refining recommendations and learning pathways based on performance data and the latest educational research."
+        "title": "Safe and school-ready",
+        "description": "Secure accounts, clear roles, and simple language students can trust."
       }
     },
     "courses": {
       "title": "FEATURED COURSES",
-      "subtitle": "Discover Your Next Learning Adventure",
-      "description": "Explore our AI-powered courses designed to adapt to your learning style and help you master new skills at your own pace.",
+      "subtitle": "Class resources picked for you",
+      "description": "Explore lessons and practice tasks prepared by your teachers and school partners.",
       "loading": "Loading courses...",
       "error": "There was an error loading courses. Please try again later.",
       "viewCourse": "View Course",
@@ -124,12 +127,12 @@
     }
   },
   "navbar": {
-    "courses": "Courses",
+    "home": "Home",
     "about": "About",
     "contact": "Contact",
     "dashboard": "Dashboard",
     "login": "Login",
-    "register": "Register",
+    "activate": "Activate Account",
     "language": {
       "english": "EN",
       "french": "FR",
@@ -268,6 +271,7 @@
       "enrolledCourses": "Enrolled Courses",
       "users": "Users",
       "assignments": "Assignments",
+      "quizzes": "Quizzes",
       "games": "Games",
       "chat": "Chat",
       "schedule": "Schedule",

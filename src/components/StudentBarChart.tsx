@@ -1,10 +1,9 @@
-//@ts-nocheck
 "use client";
 
 import { TrendingUp, BookOpen, GraduationCap } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Legend, ResponsiveContainer, Tooltip } from "recharts";
 import { useGetEnrolledCourses } from "@/hooks/useCourses";
-
+import { calculateCourseProgress } from "@/hooks/useCourses";
 import {
    Card,
    CardContent,
@@ -13,55 +12,82 @@ import {
    CardHeader,
    CardTitle,
 } from "@/components/ui/card";
-import {
-   ChartConfig,
-   ChartContainer,
-   ChartTooltip,
-   ChartTooltipContent,
-} from "@/components/ui/chart";
+import type { Course } from "@/types/course";
+
+interface ChartData {
+   name: string;
+   completed: number;
+   remaining: number;
+   category: string;
+   tooltip: string;
+}
 
 export function StudentBarChart() {
-   const { data: courses } = useGetEnrolledCourses();
+   const { data: courses = [], isLoading } = useGetEnrolledCourses();
 
-   // Generate dummy progress data for courses since progress field isn't working
-   const courseProgressData = courses?.map((course, index) => {
-      // Generate dummy progress values between 25 and 95 based on index
-      const dummyProgress = 25 + (index % 4) * 20 + Math.floor(Math.random() * 15);
+   // Calculate progress for each course
+   const courseProgressData: ChartData[] = courses.map((course: Course, index: number) => {
+      const progress = calculateCourseProgress(course);
       
       return {
          name: course.title || `Course ${index + 1}`,
-         completed: dummyProgress,
-         remaining: 100 - dummyProgress,
+         completed: progress,
+         remaining: 100 - progress,
          category: course.category || "General",
          tooltip: `${course.title || `Course ${index + 1}`} (${course.category || "General"})`
       };
-   }) || [];
+   });
 
-   // If no courses available, provide sample data for demonstration
-   const displayData = courseProgressData.length > 0 ? 
-      courseProgressData.slice(0, 6) : 
-      [
-         { name: "Machine Learning", completed: 85, remaining: 15, category: "Computer Science", tooltip: "Machine Learning (Computer Science)" },
-         { name: "Ushimwe", completed: 65, remaining: 35, category: "Machine Learning", tooltip: "Ushimwe (Machine Learning)" },
-         { name: "Uri Yahweh", completed: 45, remaining: 55, category: "Technology", tooltip: "Uri Yahweh (Technology)" },
-         { name: "Mana we", completed: 75, remaining: 25, category: "Computer Science", tooltip: "Mana we (Computer Science)" },
-         { name: "Ebeneza", completed: 30, remaining: 70, category: "Computer Science", tooltip: "Ebeneza (Computer Science)" },
-         { name: "Sinzakorwa nisoni", completed: 55, remaining: 45, category: "Science", tooltip: "Sinzakorwa nisoni (Science)" }
-      ];
+   // Show empty state if no courses
+   if (isLoading) {
+      return (
+         <Card className="border shadow-md">
+            <CardHeader>
+               <CardTitle className="text-xl font-semibold">Course Progress</CardTitle>
+            </CardHeader>
+            <CardContent>
+               <div className="h-64 flex items-center justify-center">
+                  <p className="text-gray-500">Loading course data...</p>
+               </div>
+            </CardContent>
+         </Card>
+      );
+   }
 
-   // Sort by progress (highest first)
-   displayData.sort((a, b) => b.completed - a.completed);
+   if (courseProgressData.length === 0) {
+      return (
+         <Card className="border shadow-md">
+            <CardHeader>
+               <CardTitle className="text-xl font-semibold">Course Progress</CardTitle>
+            </CardHeader>
+            <CardContent>
+               <div className="h-64 flex flex-col items-center justify-center text-gray-500">
+                  <BookOpen className="h-12 w-12 mb-2 text-gray-300" />
+                  <p>No enrolled courses yet</p>
+                  <p className="text-sm mt-1">Enroll in courses to see your progress here</p>
+               </div>
+            </CardContent>
+         </Card>
+      );
+   }
 
-   // Calculate overall dummy statistics
-   const completedCourses = Math.floor(displayData.length * 0.3); // 30% of courses completed for demo
+   // Sort by progress (highest first) and limit to top 6
+   const displayData = courseProgressData
+      .sort((a, b) => b.completed - a.completed)
+      .slice(0, 6);
+
+   // Calculate statistics
+   const completedCourses = displayData.filter((course) => course.completed >= 100).length;
    const totalCourses = displayData.length;
-   const overallProgress = Math.round(displayData.reduce((sum, course) => sum + course.completed, 0) / displayData.length);
+   const overallProgress = Math.round(
+      displayData.reduce((sum, course) => sum + course.completed, 0) / displayData.length
+   );
 
-   // Get category distribution from display data
-   const categories = displayData.reduce((acc, course) => {
+   // Get category distribution
+   const categories: Record<string, number> = displayData.reduce((acc, course) => {
       acc[course.category] = (acc[course.category] || 0) + 1;
       return acc;
-   }, {});
+   }, {} as Record<string, number>);
 
    const chartConfig = {
       completed: {
@@ -94,7 +120,7 @@ export function StudentBarChart() {
                </div>
             </CardDescription>
          </CardHeader>
-         <CardContent className="px-0"> {/* Reduced padding here */}
+         <CardContent className="px-0">
             <div className="h-64">
                <ResponsiveContainer width="100%" height="100%">
                   <BarChart
@@ -109,11 +135,11 @@ export function StudentBarChart() {
                         type="category" 
                         tick={{ fontSize: 12 }} 
                         width={80} 
-                        tickFormatter={(value) => value.length > 12 ? `${value.substring(0, 12)}...` : value} 
+                        tickFormatter={(value: string) => value.length > 12 ? `${value.substring(0, 12)}...` : value} 
                      />
                      <Tooltip
-                        formatter={(value, name) => [`${value}%`, name === "completed" ? "Completed" : "Remaining"]}
-                        labelFormatter={(label) => displayData.find(item => item.name === label)?.tooltip || label}
+                        formatter={(value: number, name: string) => [`${value}%`, name === "completed" ? "Completed" : "Remaining"]}
+                        labelFormatter={(label: string) => displayData.find(item => item.name === label)?.tooltip || label}
                      />
                      <Legend />
                      <Bar 
@@ -139,10 +165,10 @@ export function StudentBarChart() {
          <CardFooter className="pt-0 flex justify-between text-sm text-gray-500">
             <div className="flex items-center">
                <BookOpen className="h-4 w-4 mr-2" />
-               Top categories: {Object.keys(categories).slice(0, 2).join(", ")}
+               Top categories: {Object.keys(categories).slice(0, 2).join(", ") || "None"}
             </div>
             <div>
-               {totalCourses} courses enrolled
+               {totalCourses} {totalCourses === 1 ? 'course' : 'courses'} shown
             </div>
          </CardFooter>
       </Card>

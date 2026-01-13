@@ -1,11 +1,9 @@
-"use client";
+import { ReactNode } from "react";
 
-import DashboardLayout from "@/components/DashboardLayout";
-
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <DashboardLayout>
-      {children}
-    </DashboardLayout>
-  );
+export default function AdminSectionLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  return <>{children}</>;
 }

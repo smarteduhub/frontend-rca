@@ -41,10 +41,11 @@ import {
    useFetchEvents,
    useUpdateEvent,
 } from "@/hooks/useEvents";
-import { ChevronLeft, ChevronRight, Plus, Trash2, Edit2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Trash2, Edit2, Bell } from "lucide-react";
 import { useEffect, useState } from "react";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, addMinutes, addHours, addDays } from "date-fns";
 import { toast } from "react-toastify";
+import { Checkbox } from "@/components/ui/checkbox";
 
 // Color options for events
 const colorOptions = [
@@ -86,6 +87,32 @@ const EventForm = ({
    );
    const [color, setColor] = useState(event?.color || "blue");
    const [description, setDescription] = useState(event?.description || "");
+   const [hasReminder, setHasReminder] = useState(event?.has_reminder || false);
+   const [reminderTime, setReminderTime] = useState(
+      event?.reminder_time
+         ? format(new Date(event.reminder_time), "yyyy-MM-dd'T'HH:mm")
+         : ""
+   );
+   const [reminderOffset, setReminderOffset] = useState("15"); // Default 15 minutes before
+
+   // Auto-calculate reminder time when offset changes
+   useEffect(() => {
+      if (hasReminder && startTime && reminderOffset) {
+         const start = new Date(startTime);
+         let reminder: Date;
+         const offset = parseInt(reminderOffset);
+
+         if (reminderOffset.includes("min")) {
+            reminder = addMinutes(start, -offset);
+         } else if (reminderOffset.includes("hour")) {
+            reminder = addHours(start, -offset);
+         } else {
+            reminder = addDays(start, -offset);
+         }
+
+         setReminderTime(format(reminder, "yyyy-MM-dd'T'HH:mm"));
+      }
+   }, [hasReminder, startTime, reminderOffset]);
 
    const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
@@ -100,12 +127,24 @@ const EventForm = ({
          return;
       }
 
+      if (hasReminder && !reminderTime) {
+         toast.error("Please set a reminder time");
+         return;
+      }
+
+      if (hasReminder && new Date(reminderTime) >= new Date(startTime)) {
+         toast.error("Reminder time must be before event start time");
+         return;
+      }
+
       onSubmit({
          title,
          start_time: startTime,
          end_time: endTime,
          color,
          description,
+         has_reminder: hasReminder,
+         reminder_time: hasReminder ? reminderTime : undefined,
       });
    };
 
@@ -189,6 +228,59 @@ const EventForm = ({
                placeholder="Event description"
                rows={3}
             />
+         </div>
+
+         <div className="space-y-4 p-4 bg-gray-50 rounded-lg border">
+            <div className="flex items-center space-x-2">
+               <Checkbox
+                  id="reminder"
+                  checked={hasReminder}
+                  onCheckedChange={(checked) => setHasReminder(checked as boolean)}
+               />
+               <Label htmlFor="reminder" className="flex items-center gap-2 cursor-pointer">
+                  <Bell className="h-4 w-4" />
+                  Set Reminder
+               </Label>
+            </div>
+
+            {hasReminder && (
+               <div className="space-y-3 pl-6">
+                  <div className="space-y-2">
+                     <Label htmlFor="reminder-offset">Remind me</Label>
+                     <Select
+                        value={reminderOffset}
+                        onValueChange={setReminderOffset}
+                     >
+                        <SelectTrigger id="reminder-offset">
+                           <SelectValue placeholder="Select reminder time" />
+                        </SelectTrigger>
+                        <SelectContent>
+                           <SelectItem value="5">5 minutes before</SelectItem>
+                           <SelectItem value="15">15 minutes before</SelectItem>
+                           <SelectItem value="30">30 minutes before</SelectItem>
+                           <SelectItem value="1hour">1 hour before</SelectItem>
+                           <SelectItem value="2hour">2 hours before</SelectItem>
+                           <SelectItem value="1day">1 day before</SelectItem>
+                           <SelectItem value="2day">2 days before</SelectItem>
+                        </SelectContent>
+                     </Select>
+                  </div>
+                  <div className="space-y-2">
+                     <Label htmlFor="reminder-time">Custom Reminder Time</Label>
+                     <Input
+                        id="reminder-time"
+                        type="datetime-local"
+                        value={reminderTime}
+                        onChange={(e) => setReminderTime(e.target.value)}
+                     />
+                  </div>
+                  {reminderTime && (
+                     <p className="text-xs text-gray-500">
+                        Reminder will be sent on: {format(new Date(reminderTime), "PPP 'at' p")}
+                     </p>
+                  )}
+               </div>
+            )}
          </div>
 
          <DialogFooter className="gap-2 sm:gap-0">
@@ -335,7 +427,10 @@ export default function CalendarPage() {
          createEventMutation.mutate(formData, {
             onSuccess: () => {
                setIsDialogOpen(false);
-               toast.success("Event created successfully");
+               toast.success("Event created successfully! 🎉");
+               if (formData.has_reminder) {
+                  toast.info("Reminder has been set for this event 📅");
+               }
             },
             onError: (error: any) => {
                toast.error(
@@ -352,7 +447,10 @@ export default function CalendarPage() {
             {
                onSuccess: () => {
                   setIsDialogOpen(false);
-                  toast.success("Event updated successfully");
+                  toast.success("Event updated successfully! ✅");
+                  if (formData.has_reminder) {
+                     toast.info("Reminder has been updated 📅");
+                  }
                },
                onError: (error: any) => {
                   toast.error(
@@ -370,6 +468,7 @@ export default function CalendarPage() {
          deleteEventMutation.mutate(selectedEvent.id, {
             onSuccess: () => {
                setIsDialogOpen(false);
+               toast.success("Event deleted successfully! 🗑️");
             },
          });
       }

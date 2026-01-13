@@ -3,10 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbo",
+    "dev:fast": "set NODE_OPTIONS=--max-old-space-size=4096 && next dev --turbo",
+    "dev:windows": "next dev --turbo",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "clean": "rmdir /s /q .next 2>nul & rmdir /s /q node_modules\\.cache 2>nul",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@cyntler/react-doc-viewer": "^1.17.0",
@@ -24,6 +28,7 @@
     "@radix-ui/react-label": "^2.1.1",
     "@radix-ui/react-popover": "^1.1.6",
     "@radix-ui/react-progress": "^1.1.1",
+    "@radix-ui/react-radio-group": "^1.3.8",
     "@radix-ui/react-scroll-area": "^1.2.3",
     "@radix-ui/react-select": "^2.1.5",
     "@radix-ui/react-slot": "^1.1.2",
@@ -38,6 +43,7 @@
     "axios": "^1.8.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "critters": "^0.0.23",
     "date-fns": "^3.6.0",
     "embla-carousel-autoplay": "^8.5.2",
     "embla-carousel-react": "^8.5.2",

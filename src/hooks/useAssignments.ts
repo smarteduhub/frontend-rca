@@ -1,99 +1,42 @@
-//@ts-nocheck
-import { authorizedAPI } from "@/lib/api";
-import handleApiRequest from "@/utils/handleApiRequest";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-
-// Types
-interface Assignment {
-   id: string;
-   title: string;
-   description?: string;
-   course_id: string;
-   google_form_url?: string;
-   created_at: string;
-   course: {
-      id: string;
-      title: string;
-   };
-}
-
-const getAllAssignments = (): Promise<any> => {
-   return handleApiRequest(() => authorizedAPI.get("/assignments"));
-};
-
-const createAssignment = (formData: any): Promise<Assignment> => {
-   const payload = {
-      ...formData,
-      google_form_url: formData.google_form_url || null, // Ensure null if empty
-   };
-   return handleApiRequest(() => authorizedAPI.post("/assignments", payload));
-};
-
-const updateAssignment = ({ formData, _id }: any): Promise<any> => {
-   return handleApiRequest(() =>
-      authorizedAPI.put(`/assignments/${_id}`, formData)
-   );
-};
-
-const getAssignmentById = ({ queryKey }: any): Promise<any> => {
-   const [_, _id] = queryKey;
-   if (!_id) throw new Error("Assignment ID is required");
-   return handleApiRequest(() => authorizedAPI.get(`/assignments/${_id}`));
-};
-
-const deleteAssignmentById = (_id: string): Promise<any> => {
-   return handleApiRequest(() => authorizedAPI.delete(`/assignments/${_id}`));
-};
-
-const getTeacherAssignments = (): Promise<any> => {
-   return handleApiRequest(() => authorizedAPI.get("/assignments/teacher"));
-};
-
-const getStudentAssignments = (): Promise<any> => {
-   return handleApiRequest(() => authorizedAPI.get("/assignments/student"));
-};
-
-const submitAssignment = (data: { assignmentId: string }): Promise<any> => {
-   return handleApiRequest(() =>
-      authorizedAPI.post(`/assignments/${data.assignmentId}/submit`)
-   );
-};
+import { assignmentService } from "@/services";
+import type { Assignment } from "@/types/assignments";
 
 export const useGetAllAssignments = () =>
-   useQuery<any, Error>({
+   useQuery<Assignment[], Error>({
       queryKey: ["assignments"],
-      queryFn: getAllAssignments,
+      queryFn: () => assignmentService.getAll(),
    });
 
 export const useCreateAssignment = () => {
-   return useMutation<any, Error, any>({
-      mutationFn: createAssignment,
+   return useMutation<Assignment, Error, Partial<Assignment>>({
+      mutationFn: (data) => assignmentService.create(data),
    });
 };
 
 export const useUpdateAssignment = () => {
-   return useMutation<any, Error, any>({
-      mutationFn: updateAssignment,
+   return useMutation<Assignment, Error, { id: string; data: Partial<Assignment> }>({
+      mutationFn: ({ id, data }) => assignmentService.update(id, data),
    });
 };
 
 export const useDeleteAssignment = () => {
-   return useMutation<any, Error, string>({
-      mutationFn: deleteAssignmentById,
+   return useMutation<void, Error, string>({
+      mutationFn: (id) => assignmentService.delete(id),
    });
 };
 
-export const useGetAssignmentById = (_id?: string) =>
-   useQuery<any, Error>({
-      queryKey: ["assignment", _id],
-      queryFn: getAssignmentById,
-      enabled: !!_id, // Only run the query if _id exists
+export const useGetAssignmentById = (id?: string) =>
+   useQuery<Assignment, Error>({
+      queryKey: ["assignment", id],
+      queryFn: () => assignmentService.getById(id!),
+      enabled: !!id, // Only run the query if id exists
    });
 
 export const useGetTeacherAssignments = () =>
    useQuery<Assignment[], Error>({
       queryKey: ["teacherAssignments"],
-      queryFn: getTeacherAssignments,
+      queryFn: () => assignmentService.getTeacherAssignments(),
       retry: false,
       onError: (error) => {
          console.error("Error fetching teacher assignments:", error);
@@ -103,7 +46,7 @@ export const useGetTeacherAssignments = () =>
 export const useGetStudentAssignments = () =>
    useQuery<Assignment[], Error>({
       queryKey: ["studentAssignments"],
-      queryFn: getStudentAssignments,
+      queryFn: () => assignmentService.getStudentAssignments(),
       retry: false,
       onError: (error) => {
          console.error("Error fetching student assignments:", error);
@@ -112,8 +55,8 @@ export const useGetStudentAssignments = () =>
 
 export const useSubmitAssignment = () => {
    const queryClient = useQueryClient();
-   return useMutation({
-      mutationFn: submitAssignment,
+   return useMutation<void, Error, { assignmentId: string }>({
+      mutationFn: ({ assignmentId }) => assignmentService.submit(assignmentId),
       onSuccess: () => {
          queryClient.invalidateQueries({ queryKey: ["studentAssignments"] });
       },
