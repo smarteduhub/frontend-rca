@@ -73,6 +73,20 @@ function LoginForm() {
       ? "Your account is inactive. Please activate and log in."
       : null;
 
+  const getDashboardPath = (role?: string) => {
+    switch ((role || "").toLowerCase()) {
+      case "admin":
+        return "/admin/dashboard";
+      case "teacher":
+        return "/teacher/dashboard";
+      case "parent":
+        return "/parent/dashboard";
+      case "student":
+      default:
+        return "/student/dashboard";
+    }
+  };
+
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
     try {
@@ -84,32 +98,22 @@ function LoginForm() {
         // Then set the new token
         cookies.set("access_token", response.access_token, { path: "/" });
 
-        try {
-          const payload = JSON.parse(atob(response.access_token.split(".")[1]));
-
-          if (redirectUrl) {
-            location.replace(redirectUrl);
-          } else {
-            // Redirect based on role
-            switch (payload.role) {
-              case "admin":
-                location.replace("/admin");
-                break;
-              case "teacher":
-                location.replace("/teacher");
-                break;
-              case "parent":
-                location.replace("/parent");
-                break;
-              case "student":
-                location.replace("/student");
-                break;
-              default:
-                location.replace("/student");
-            }
+        const roleFromToken = (() => {
+          try {
+            const payload = JSON.parse(atob(response.access_token.split(".")[1]));
+            return payload?.role as string | undefined;
+          } catch {
+            return undefined;
           }
-        } catch (error) {
-          // If token decoding fails, show error and remove the token
+        })();
+
+        const roleFromUser = (response as any)?.user?.role as string | undefined;
+        const destination = redirectUrl || getDashboardPath(roleFromToken || roleFromUser);
+
+        if (roleFromToken || roleFromUser) {
+          location.replace(destination);
+        } else {
+          // If role missing/undecodable, clear token and warn
           cookies.remove("access_token", { path: "/" });
           toast.error("Authentication error. Please login again.");
         }

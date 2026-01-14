@@ -24,6 +24,20 @@ import { toast } from "react-toastify";
 
 const cookies = new Cookies();
 
+const getDashboardPath = (role?: string) => {
+  switch ((role || "").toLowerCase()) {
+    case "admin":
+      return "/admin/dashboard";
+    case "teacher":
+      return "/teacher/dashboard";
+    case "parent":
+      return "/parent/dashboard";
+    case "student":
+    default:
+      return "/student/dashboard";
+  }
+};
+
 // Support both email and studentId for backward compatibility
 export interface LoginData {
   email?: string;
@@ -104,22 +118,8 @@ export const useLoginUser = () => {
           setUser(mapUserResponseToUser(profile as UserResponse));
           setIsAuthenticated(true);
           // Redirect by role
-          const role = (profile as any)?.role;
-          switch (role) {
-            case "admin":
-              router.replace("/admin");
-              break;
-            case "teacher":
-              router.replace("/teacher");
-              break;
-            case "parent":
-              router.replace("/parent");
-              break;
-            case "student":
-            default:
-              router.replace("/student");
-              break;
-          }
+          const role = (profile as any)?.role as string | undefined;
+          router.replace(getDashboardPath(role));
         } catch (err) {
           console.error("Profile fetch after login failed:", err);
         }
@@ -244,22 +244,7 @@ export const useOAuthCallback = () => {
 
           // Redirect to role-specific dashboard
           if (typeof window !== "undefined") {
-            switch (role) {
-              case "admin":
-                location.replace("/admin");
-                break;
-              case "teacher":
-                location.replace("/teacher");
-                break;
-              case "parent":
-                location.replace("/parent");
-                break;
-              case "student":
-                location.replace("/student");
-                break;
-              default:
-                location.replace("/student");
-            }
+            location.replace(getDashboardPath(role));
           }
         } else {
           // OAuth response missing required data
